@@ -1,0 +1,111 @@
+
+
+    <!-- <canvas id="screen" width="310" height="310"></canvas> -->
+    <canvas id="screen">
+        Canvas in not supported
+    </canvas>
+
+    
+    <!--Loading Toast ...................................................... -->
+    <div id="loadingToast" class="toast">
+        <h1 id="loadToastTitle" class="title">
+            SPACE DEFENDER
+        </h1>   
+        <span id="loadingToastBlurb" class="blurb">     
+        <p>This is a twist on the classic "old school" video game Space Invaders.
+        It has multiple levels. The diffculty of each level increases with the
+        Aliens getting smarter, faster and more numerous as the levels increase.</p>
+        <p>How to play Space Attack</p>
+
+        <ul>
+            <li>This is only the loading screen. To move left, right, up and down press the appropriate arrow on the keyboard.</li>
+            <li>To fire press the spacebar.</li>
+            <li>To pause the game press the "p" key once.</li>
+            <li>To auto-pause the game just click outside the game. It will resume when you click inside the game.</li>
+            <li>To play another game click reload or hit the spacebar.</li>
+            <li>To load and then play the game just press load  or hit the spacebar.</li>
+        </ul>
+        </span>
+        <span id='loadButtonSpan'>
+            <button id='loadButton' autofocus="true">
+                <strong>Load Game</strong>                
+            </button>
+            <!-- <input type='button' id='loadButton' value="Load Game" autofocus="true" /> -->
+        </span>
+
+        <div id='progressbar' class="hide"></div>
+    </div>
+    <!-- Scores..............................................................-->
+
+    <div id='scoreToast' class="toast hide"></div>
+
+    <!-- Lives...............................................................-->
+
+    <!-- Paused..............................................................-->
+    <div id='pausedToast' class='toast hide'>
+        <p class='title'><strong>Game Paused</strong></p>
+        <p class='title'><strong>Click to start</strong></p>
+    </div>
+    <!--  Game Over.....................................................-->
+    <div id='gameOverToast' class='toast hide'>
+        <p class='title'>Game Over</p> 
+        <!-- <p>
+            <input id='clearHighScoreCheckBox' type='checkbox' />
+            &nbspClear High Scores
+        </p> -->
+        <button id="newGameButton" class="newGameButton" autofocus="true">
+            <strong>Click For New Game</strong>
+        </button>
+    </div>
+
+
+
+    <!--  High Scores........................................................-->
+
+    <div id='highScoreToast' class="hide">
+        <div id='highScoreToastInnerContainer'>
+            
+            <p id='highScoreParagraph'></p>
+
+            <p class='title' id="highScore">Your Score!</p>
+
+            <form class="" role="search" method="post" action="/highscore" enctype="application/x-www-form-urlencoded">
+                
+                <label for="nameInput">What's your name?</label>
+                <input id='nameInput' type="text" name="name" autofocus="true">
+
+                <input id='inputScore' type="hidden" name="score">
+
+                <button  id='addMyScoreButton' type="submit">
+                    <strong>Add My Score</strong>
+                </button>
+
+                <button  id='newGameFromHighScoreButton' class="newGameButton" disabled="true">
+                    <strong>New Game</strong>
+                </button>
+            </form>
+
+                <p id='previousHighScore' class="title">Previous High Scores</p>
+
+            <!-- The following ordered list is popuilated by Handlebars/Pug in the game. -->
+            <ol id='highScoreList'>
+            {{#if players}}
+                {{#each players}}
+                    <li>{{name}} {{score}}</li>
+                {{/each}}
+            {{/if}}
+        </ol>
+            
+        </div>
+
+        <!-- Game Toast......................................................-->
+
+
+        
+    </div>
+
+
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/bundle.js"></script>
+
+

@@ -1,0 +1,131 @@
+/* defenderStyles.css */
+
+html {
+    font-family: Helvetica;
+    background: darkred;
+    background-image: url("../images/Space_1.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    padding-right: 0;*/
+    color: white;
+}
+body {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    text-align: center;
+    color: white;
+    width: 40%;
+    margin: 0 auto;
+}
+
+div#loadingToast {
+    /*margin-top: 5rem;*/
+    border-radius: 0.5rem; 
+    background-color: #8A8A8A;
+    padding: 2rem;
+    border: 2px solid orange;
+    opacity: 0.9;
+}
+
+#loadingToast {
+    width: 50%;
+    margin: auto;
+}
+#pausedToast {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 5px;
+    padding: 0 2rem 0 2rem;
+    font-size: 1.5rem;
+    text-align: center;
+    color: black;
+    border: 2px solid black;
+    background-color: white;
+    opacity: 0.8;
+    width: 25%;
+    margin: auto;
+}
+
+#gameOverToast  {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 5px;
+    padding: 0 2rem 2rem 2rem;
+    font-size: 1.5rem;
+    text-align: center;
+    color: black;
+    border: 2px solid black;
+    background-color: white;
+    opacity: 0.9;
+    width: 25%;
+    margin: auto;
+}
+#newGameButton {
+    border-radius: 5px;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+#highScoreParagraph{
+    text-align: center;
+    margin: 1rem auto;
+    font-size: 3rem;
+}
+input[type=text] {
+    height: 1rem;
+    width: 8rem;
+}
+
+div#highScoreToast {
+    position: absolute;
+    /*margin-top: 5rem;*/
+    border-radius: 0.33rem; 
+    background-color: #8A8A8A;
+    padding: 0 1rem 0 1rem;
+    border: 2px solid orange;
+    opacity: 0.85;
+}
+#highScoreToast {
+    width: 33%;
+    margin: auto;
+}
+#highScoreToastInnerContainer {
+    width: 100%; /* 75% */
+    margin: 5rem auto;
+
+}
+
+#highScore {
+    font-size: 1.75rem;
+}
+
+#previousHighScore {
+    font-size: 1.75rem;
+}
+
+#loadButton {
+    border-radius: 0.25rem;
+    font-size: 2rem;
+    display: block;
+    height: 5%;
+    width: 50%;
+    margin: 3rem auto;
+}
+
+.hide {
+    display: none;
+}
+
+
+
+
+

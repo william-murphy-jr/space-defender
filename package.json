@@ -1,0 +1,27 @@
+{
+  "name": "space_defender",
+  "version": "0.0.1",
+  "description": "this is a play on the classic video game space invaders",
+  "scripts": {
+    "build": "webpack --watch -d",
+    "start": "node space_defender.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "latest",
+    "express3-handlebars": "^0.5.1",
+    "mongoose": "^5.4.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "babel-loader": "^8.0.5",
+    "chai": "1.10.0",
+    "mocha": "latest",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3"
+  },
+  "main": "space_defender.js",
+  "author": "william_murphy_jr",
+  "license": "ISC"
+}

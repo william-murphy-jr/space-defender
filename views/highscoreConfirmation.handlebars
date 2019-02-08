@@ -1,0 +1,63 @@
+<div id='highScoreToast' class="_hide">
+        <div id='highScoreToastInnerContainer'>
+            
+            {{!-- <p id='highScoreParagraph'>{{score}}</p> --}}
+
+           
+                <p id='highScoreParagraph'></p>
+
+                <p class='title' id="highScore">Your Score is! <h1>{{score}}</h1></p>
+                
+                <p>Thanks for playing Space Defender.</p>
+                <p> Play another game?</p>
+
+                {{!-- <input id='nameInput' type="text" autofocus="true"> --}}
+
+                {{!-- <input id='addMyScoreButton' type="text"></input>
+
+                <input id='addMyScoreButton' name='addMyScoreButton' type='submit' value='Add My Score'> --}}
+
+                <!-- <button  id='addMyScoreButton'>
+                    <strong>Add My Score</strong>
+                </button> -->
+
+                <button  id='newGameFromHighScoreButton' class="newGameButton">
+                    <strong>New Game</strong>
+                </button>
+                
+           
+                <p id='previousHighScore' class="title">Previous High Scores</p>
+
+                <!-- The following ordered list is popuilated by Handlebars/Pug in the game. -->
+                <ol id='highScoreList'>
+                    {{#if players}}
+                        {{#each players}}
+                            <li>{{name}} {{score}}</li>
+                        {{/each}}
+                    {{/if}}
+                </ol>
+
+                <!-- Script needed to get reload working -->
+                <script type="text/javascript" src="/js/jquery.js"></script>
+
+                <script type="text/javascript">
+                    jQuery('#newGameFromHighScoreButton').on('click', function(e){
+                            // console.log('game.start();');
+                            // Get the reset() working later
+                            // game.reset();
+                            window.location.href = window.location.origin;
+                            // // game.start();
+                        });
+
+                </script>
+
+
+
+            
+        </div>
+
+        <!-- Game Toast......................................................-->
+
+
+        
+    </div>
