@@ -6,8 +6,12 @@ var router = express.Router();
 var path = __dirname + '/views/';
 var bodyParser = require('body-parser');
 // var multer = require('multer');
+var morgan = require('morgan');
+
 var db = require('./model/db');
 
+
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 var handlebars = require('express3-handlebars')
