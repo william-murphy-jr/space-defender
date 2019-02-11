@@ -125,7 +125,27 @@ div#highScoreToast {
     display: none;
 }
 
+.close-high-score-box {
+    height: 3em;
+}
 
+.closeHighScoreToast {
+    float: right;
+    font-size: 1.5em;
+}
 
+.closeHighScoreToast span {
+    font-size: 2em;
+}
 
+.closeHighScoreToast:hover {
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
 
