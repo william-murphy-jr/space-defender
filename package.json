@@ -10,6 +10,7 @@
     "body-parser": "^1.18.3",
     "express": "latest",
     "express3-handlebars": "^0.5.1",
+    "jquery": "^3.3.1",
     "mongoose": "^5.4.10",
     "morgan": "^1.9.1"
   },

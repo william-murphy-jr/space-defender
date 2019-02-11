@@ -1086,6 +1086,10 @@ $(window).on('focus', function() {
         game.togglePaused();
     }
 });
+
+$('.closeHighScoreToast').on('click', function () {
+    window.location.reload();
+});
     
     // Queue Images here
 
