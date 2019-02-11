@@ -158,7 +158,7 @@ Game.prototype = {
                     this.explosionSound.load();
                     this.explosionSound.play();
                 } catch (error) {
-                    console.log('Error with either loading & playing sound: ', error); // pass exception object to error handler
+                    console.log('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
 
                 tempBodies[i].size.x = tempBodies[i].size.x * 2.5;
@@ -587,6 +587,13 @@ Invader.prototype = {
                 this.size.x / 2}, targetLocation, 
                 this.gameSize);
             this.game.addBody(bullet);
+
+            try {
+                this.game.alienShootSound.load();
+                this.game.alienShootSound.play();
+            } catch (error) {
+                console.log('Error adding alienShootSound: ', error);
+            }
         }
     },
     draw: function(screen, body) {
