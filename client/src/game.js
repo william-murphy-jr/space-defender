@@ -154,6 +154,13 @@ Game.prototype = {
                 tempBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
                 tempBodies[i].name = "explosion";
 
+                try {
+                    this.explosionSound.load();
+                    this.explosionSound.play();
+                } catch (error) {
+                    console.log('Error with either loading & playing sound: ', error); // pass exception object to error handler
+                }
+
                 tempBodies[i].size.x = tempBodies[i].size.x * 2.5;
                 tempBodies[i].size.y = tempBodies[i].size.y * 2.5;
             }
@@ -523,7 +530,6 @@ Player.prototype = {
             } 
             catch(error) {
                 console.log('Error loading sound: ', error);
-                // Sound loading error
             }
         }
     },
