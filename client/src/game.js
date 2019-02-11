@@ -58,9 +58,26 @@ console.warn("Defender Running ...");
 
         // methods
 
-        loadSound("/sounds/click.wav", function(shootSound) {
-            self.shootSound = shootSound;
-            });
+        // loadSound("/sounds/click.wav", function(shootSound) {
+        //     self.shootSound = shootSound;
+        //     });
+
+         // methods
+
+         // Load our sounds here
+         // Todo --- Put this into an obj to use as sound => url mapping
+         loadSound("/sounds/rocket-ver-1.wav", function (shootSound) {
+             self.shootSound = shootSound;
+         });
+
+         loadSound("/sounds/explosion-ver-3.wav", function (explosionSound) {
+             self.explosionSound = explosionSound;
+         });
+
+         loadSound("/sounds/Alien_Gun-ver-1.wav", function (alienShootSound) {
+             self.alienShootSound = alienShootSound;
+
+         });
 
         self.animate = function(time) {
 
@@ -498,8 +515,16 @@ Player.prototype = {
                 this.gameSize);
             this.game.score -= 5;
             this.game.addBody(missle);
-            this.game.shootSound.load();
-            this.game.shootSound.play();
+
+
+            try {
+                this.game.shootSound.load();
+                this.game.shootSound.play();
+            } 
+            catch(error) {
+                console.log('Error loading sound: ', error);
+                // Sound loading error
+            }
         }
     },
     draw: function(screen, body) {
