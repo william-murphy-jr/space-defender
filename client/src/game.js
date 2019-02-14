@@ -1226,12 +1226,3 @@ $('#screen').show();
 });
 
 var gScore = game.score;
-
-
-
-
-
-
-
-
-
