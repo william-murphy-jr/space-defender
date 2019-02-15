@@ -1068,6 +1068,7 @@ $('.newGameButton').on('click', function(e){
 });
 
 $('.closeHighScoreToast').on('click', function () {
+    console.log('Close High Score Toast CLICKED!!!');
     window.location.href = window.location.origin;
 });
 
