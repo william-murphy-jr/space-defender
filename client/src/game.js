@@ -1067,9 +1067,9 @@ $('.newGameButton').on('click', function(e){
     window.location.href = window.location.origin;
 });
 
-$('.closeHighScoreToast').on('click', function () {
-    console.log('Close High Score Toast CLICKED!!!');
+$('.closeHighScoreToast').on('click', function() {
     window.location.href = window.location.origin;
+    console.log('closeHighScoreToast!!!')
 });
 
 $(window).on('blur', function() {
