@@ -56,16 +56,8 @@ console.warn("Defender Running ...");
         this.togglePaused = togglePaused; // function
         this.keyboarder = new Keyboarder(this);
 
-        // methods
-
-        // loadSound("/sounds/click.wav", function(shootSound) {
-        //     self.shootSound = shootSound;
-        //     });
-
-         // methods
-
-         // Load our sounds here
-         // Todo --- Put this into an obj to use as sound => url mapping
+        // Todo --- Put this into an obj to use as sound => url mapping
+        // Load our sounds here
          loadSound("/sounds/rocket-ver-1.wav", function (shootSound) {
              self.shootSound = shootSound;
          });
@@ -1071,7 +1063,11 @@ $('.newGameButton').on('click', function(e){
     // Get the reset() working later
     // game.reset();
     // game.start();
-    // window.location.reload();
+    // window.location.reload(); // inconsistent
+    window.location.href = window.location.origin;
+});
+
+$('.closeHighScoreToast').on('click', function () {
     window.location.href = window.location.origin;
 });
 
@@ -1085,10 +1081,6 @@ $(window).on('focus', function() {
     if (game.paused) {
         game.togglePaused();
     }
-});
-
-$('.closeHighScoreToast').on('click', function () {
-    window.location.reload();
 });
     
     // Queue Images here
