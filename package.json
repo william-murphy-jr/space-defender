@@ -4,6 +4,7 @@
   "description": "this is a play on the classic video game space invaders",
   "scripts": {
     "build": "webpack --watch -d",
+    "pm2": "sudo pm2 start space_defender.js",
     "start": "node space_defender.js"
   },
   "dependencies": {
