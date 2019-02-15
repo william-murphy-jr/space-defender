@@ -1058,12 +1058,13 @@ $('#pausedToast').on('click', function(e){
 });
 
 
-$('.newGameButton').on('click', function(e){
+$('.newGameButton, .closeHighScoreToast').on('click', function (e) {
     // console.log('game.start();');
     // Get the reset() working later
     // game.reset();
     // game.start();
     // window.location.reload(); // inconsistent
+    console.log('Button Pressed!!!')
     window.location.href = window.location.origin;
 });
 
