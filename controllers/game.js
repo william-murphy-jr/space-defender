@@ -19,7 +19,7 @@ exports.highscore = function(req, res){
 }
 
 exports.highscoreConfirmation = function(req, res){
-	console.log('*** /highscoreConfirmation *** route hit!!!');
+	// console.log('*** /highscoreConfirmation *** route hit!!!');
 	res.render('highscoreConfirmation', {
 		score: 99999
 	});

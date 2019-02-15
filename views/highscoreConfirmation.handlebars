@@ -1,11 +1,8 @@
 <div id='highScoreToast' class="_hide">
-    <div class="close-high-score-box">
-        <div class='closeHighScoreToast'><span>&times</span></div>
-    </div>
+    {{!-- <div class="close-high-score-box">
+        <div class="closeHighScoreToast"><span>&times</span></div>
+    </div> --}}
     <div id='highScoreToastInnerContainer clearfix'>
-        
-        {{!-- <p id='highScoreParagraph'>{{score}}</p> --}}
-
         
             <p id='highScoreParagraph'></p>
 
@@ -14,16 +11,6 @@
             <p>Thanks for playing Space Defender.</p>
             <p> Play another game?</p>
 
-            {{!-- <input id='nameInput' type="text" autofocus="true"> --}}
-
-            {{!-- <input id='addMyScoreButton' type="text"></input>
-
-            <input id='addMyScoreButton' name='addMyScoreButton' type='submit' value='Add My Score'> --}}
-
-            <!-- <button  id='addMyScoreButton'>
-                <strong>Add My Score</strong>
-            </button> -->
-
             <button  id='newGameFromHighScoreButton' class="newGameButton">
                 <strong>New Game</strong>
             </button>
@@ -31,7 +18,7 @@
         
             <p id='previousHighScore' class="title">Previous High Scores</p>
 
-            <!-- The following ordered list is popuilated by Handlebars/Pug in the game. -->
+            <!-- The following ordered list is populated by Handlebars/Pug in the game. -->
             <ol id='highScoreList'>
                 {{#if players}}
                     {{#each players}}

@@ -1057,7 +1057,6 @@ $('#pausedToast').on('click', function(e){
     game.togglePaused();
 });
 
-
 $('.newGameButton, .closeHighScoreToast').on('click', function (e) {
     // console.log('game.start();');
     // Get the reset() working later
@@ -1068,9 +1067,9 @@ $('.newGameButton, .closeHighScoreToast').on('click', function (e) {
     window.location.href = window.location.origin;
 });
 
-$('.closeHighScoreToast').on('click', function() {
+$('#newGameFromHighScore.newGame').on('click', function (e) {
+    console.log('newGameFromHighScore.newGame clicked!!!')
     window.location.href = window.location.origin;
-    console.log('closeHighScoreToast!!!')
 });
 
 $(window).on('blur', function() {
@@ -1179,7 +1178,7 @@ $('#screen').hide();
 
 
 // click to start game
-$('#loadButton').on('click', function(e){
+$('#loadButton').on('click', function (e) {
 
 /* Hide HTML using CSS
  * Classes are used for speed
@@ -1213,7 +1212,8 @@ $('#screen').show();
             
     // game.loadLevel(0);
     e.preventDefault();
-    // Delay game to make sure all assets have loaded
+    // Delay start of game to make sure all assets have loaded
+    // TODO change to a promise/callback
     setTimeout(function(){
         game.start();
     }, 250)

@@ -5,3 +5,5 @@ data/db
 *.bak
 *.*~
 *~
+
+public/js/bundle.js
