@@ -26,7 +26,9 @@
 
 ## Usage
 
-> 
+> localhost:9009 or what ever port you decide to set the server up on.
+> This version requires that an Node/Express server be set up and running.
+> If you do no know how to do this then go ahead read the doc's.
 
 ## Requirements
 

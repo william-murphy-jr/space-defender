@@ -1,7 +1,7 @@
 // space_defender.js
 
-// TODO Fix Audio Play Error 
 // Break into Modules
+// TODO Fix Audio Play Error 
 // See https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
 
 console.warn("Defender Running ...");
