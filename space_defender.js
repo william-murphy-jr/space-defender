@@ -3,8 +3,6 @@
 var express = require("express");
 var app = express();
 require('dotenv').config();
-var router = express.Router();
-var path = __dirname + '/views/';
 var bodyParser = require('body-parser');
 // var multer = require('multer');
 var morgan = require('morgan');
