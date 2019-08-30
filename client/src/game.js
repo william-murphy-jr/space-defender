@@ -22,6 +22,7 @@ console.warn("Defender Running ...");
         this.screen = canvas.getContext('2d');
         this.gameSize = { x: canvas.width, y: canvas.height };
         var self = this;
+        var score = 0
 
         this. keyListeners = [];
 
@@ -61,7 +62,11 @@ console.warn("Defender Running ...");
         this.explosionImages = [];
         this.togglePaused = togglePaused; // function
         this.keyboarder = new Keyboarder(this);
-
+        
+        var setScore = function(points) {
+            score += points;
+        }
+        
         // Todo --- Put this into an obj to use as sound => url mapping
         // Load our sounds here
          loadSound("/sounds/rocket-ver-1.wav", function (shootSound) {
@@ -76,6 +81,7 @@ console.warn("Defender Running ...");
              self.alienShootSound = alienShootSound;
 
          });
+
 
         self.animate = function(time) {
 
@@ -127,6 +133,10 @@ Game.prototype = {
         this.paused = false;
     },
 
+    getScore: function () {
+        return score;
+    },
+
     update: function(time) {
         var bodies = this.bodies;
         var tempBodies = bodies.slice(0);
@@ -146,7 +156,7 @@ Game.prototype = {
         for (var i = 0; i < tempBodies.length; i++) {
             if (tempBodies[i].name === "invader" || tempBodies[i].name === "player") {
                 if (tempBodies[i].name === "invader" ) {
-                    this.score += 100 * (this.getLevel() + 1);
+                    setScore(100 * (this.getLevel() + 1));
                 }
                 // console.log("score: ", this.score);
                 tempBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
@@ -263,6 +273,8 @@ Game.prototype = {
     },
 
     getLevel: function() {
+        setScore(1033)
+        console.log('this.getScore: ', this.getScore())
         return this.level;
     },
 
