@@ -39,6 +39,7 @@ console.warn("Defender Running ...");
         this.levelData  = levelData;
 
         this.player = {};
+        this.playerCachedCopy = {};
         this.radar = false;
 
         this.imageLoadingProgressCallback = {};
@@ -128,38 +129,43 @@ Game.prototype = {
     },
 
     update: function(time) {
-        var bodies = this.bodies;
-        var tempBodies = bodies.slice(0);
+        const bodies = this.bodies;
+        const tempBodies = [...bodies];
 
-        var invadersLeftAlive = [];
-
-        var isCollingWithSomething = function(b1) {
+       const isCollidingWithSomething = function(b1) {
             return tempBodies.filter(function(b2) { return colliding(b1, b2); }).length > 0; 
         };
 
-        let filteredBodies = tempBodies.filter(isCollingWithSomething);
-        
-        let invaderFilteredBodies = filteredBodies.filter(function(unknownBody) {
-            return unknownBody instanceof Invader;
-        });
+        const filteredBodies = tempBodies.filter(isCollidingWithSomething);
+        const invaderFilteredBodies = [];
+        const playerFilteredBodies = [];
 
-        let playerFilteredBodies = filteredBodies.filter(function(unknownBody) {
-            return unknownBody instanceof Player;
-        });
+        // Filter w/o using a slower array filter method
+        for (let i = 0; i < filteredBodies.length; i++) {
+            const unknownFilteredBody = filteredBodies[i];
 
-        for (var i = 0; i < invaderFilteredBodies.length; i++) {
+            if (unknownFilteredBody instanceof Invader) {
+                invaderFilteredBodies.push(unknownFilteredBody)
+            }
+
+            if (unknownFilteredBody instanceof Player) {
+                playerFilteredBodies.push(unknownFilteredBody)
+            }
+        }
+
+        for (let i = 0; i < invaderFilteredBodies.length; i++) {
             if (invaderFilteredBodies[i].name === "invader") {
                 this.score += 100 * (this.getLevel() + 1);
                 
                 // console.log("score: ", this.score);
-                invaderFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
+                invaderFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages, 'Invader');
                 invaderFilteredBodies[i].name = "explosion";
                 
                 try {
                     this.explosionSound.load();
                     this.explosionSound.play();
                 } catch (error) {
-                    console.log('Error with loading & playing sound: ', error); // pass exception object to error handler
+                    console.error('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
                 
                 invaderFilteredBodies[i].size.x = invaderFilteredBodies[i].size.x * 2.5;
@@ -167,9 +173,11 @@ Game.prototype = {
             }
         }
         
-        for (var i = 0; i < playerFilteredBodies.length; i++) {                
+        for (let i = 0; i < playerFilteredBodies.length; i++) {
+            this.playerCachedCopy = _.cloneDeep(playerFilteredBodies[i]);
+            console.log('this.playerCachedCopy: ', this.playerCachedCopy);
             if (playerFilteredBodies[i].name === "player") {
-                playerFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
+                playerFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages, 'Player');
                 playerFilteredBodies[i].name = "explosion";
 
                 try {
@@ -184,32 +192,31 @@ Game.prototype = {
             }
         }
 
-        var notCollingWithAnything = function(b1) {
+        const notCollidingWithAnything = function(b1) {
             return bodies.filter(function(b2) { return colliding(b1, b2); }).length === 0; 
         };
 
-        this.bodies = this.bodies.filter(notCollingWithAnything);
+        this.bodies = this.bodies.filter(notCollidingWithAnything);
 
         // Are all Invaders are destroyed 
-        invadersLeftAlive = this.bodies.filter(function(unknownBody) {
+        const invadersLeftAlive = this.bodies.filter(function(unknownBody) {
             return unknownBody instanceof Invader;
         });
 
         if (invadersLeftAlive.length < 5 && invadersLeftAlive.length >= 3){
             this.invaderFireRate = 0.98;
+            // Radar is on and stays on from here on this level
             this.radar = true;
         } else  if (invadersLeftAlive.length < 3 && invadersLeftAlive.length >= 2){
             this.invaderFireRate = 0.96;
-            // this.radar = true;
         } else if (invadersLeftAlive.length < 2) {
             this.invaderFireRate = 0.92;
-            // this.radar = true;
         }
 
         const allFilteredBodies = [...invaderFilteredBodies, ...playerFilteredBodies];
         // Add bodies back with explosion
         if (allFilteredBodies.length > 0) {     
-            for (var j = 0; j < allFilteredBodies.length; j++) {
+            for (let j = 0; j < allFilteredBodies.length; j++) {
                 this.bodies.push(allFilteredBodies[j]);
             }
         }
@@ -223,7 +230,7 @@ Game.prototype = {
              return theBody.remove === false;
         }); 
 
-        var isPlayerAlive = this.bodies.filter(function(unknownBody) {
+        const isPlayerAlive = this.bodies.filter(function(unknownBody) {
             return unknownBody instanceof Player;
         });
 
@@ -236,7 +243,7 @@ Game.prototype = {
             }, 750);
         }
 
-        if (invadersLeftAlive.length <= 0 && isPlayerAlive.length === 1) {
+        if (invadersLeftAlive.length <= 0 && isPlayerAlive.length > 0) {
             this.paused = true;     
             this.incrementLevel();
             setTimeout(function() {
@@ -245,7 +252,7 @@ Game.prototype = {
         }
 
         // Update Position
-        for (var idx = 0; idx < this.bodies.length; idx++) {
+        for (let idx = 0; idx < this.bodies.length; idx++) {
             this.bodies[idx].update(time);
         }
     },  // update
@@ -942,18 +949,30 @@ SpritePainter.prototype = {
     }
 };
 
-var ExplosionSpritePainter = function(images) {
+var ExplosionSpritePainter = function(images, instanceFor) {
     this.images = images;
     this.imagesIndex = 0;
+    this.instanceFor = instanceFor ? instanceFor : null;
 };
 
 ExplosionSpritePainter.prototype = {
     advance: function(body) {
-        if (this.imagesIndex === this.images.length -1) {
-            // this.imagesIndex = 0;
-            body.remove = true;
-            body.visible = false;
-            body.animating = false;
+        if (this.imagesIndex === this.images.length - 1) {
+            if  (this.instanceFor === 'Invader') {
+                body.remove = true;
+                body.visible = false;
+                body.animating = false;
+
+            // } else if  (this.instanceFor === 'Player') {
+            //     body.remove = false;
+            //     body.visible = true;
+            //     body.animating = false;
+
+            } else {
+                body.remove = true;
+                body.visible = false;
+                body.animating = false;
+            }
         } else {
             this.imagesIndex++;
         }
