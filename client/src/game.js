@@ -148,27 +148,27 @@ Game.prototype = {
         });
 
         for (var i = 0; i < invaderFilteredBodies.length; i++) {
-            if (invaderFilteredBodies[i].name === "invader" || invaderFilteredBodies[i].name === "player") {
-                if (invaderFilteredBodies[i].name === "invader" ) {
-                    this.score += 100 * (this.getLevel() + 1);
-                }
+            if (invaderFilteredBodies[i].name === "invader") {
+                this.score += 100 * (this.getLevel() + 1);
+                
                 // console.log("score: ", this.score);
                 invaderFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
                 invaderFilteredBodies[i].name = "explosion";
-
+                
                 try {
                     this.explosionSound.load();
                     this.explosionSound.play();
                 } catch (error) {
                     console.log('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
-
+                
                 invaderFilteredBodies[i].size.x = invaderFilteredBodies[i].size.x * 2.5;
                 invaderFilteredBodies[i].size.y = invaderFilteredBodies[i].size.y * 2.5;
             }
         }
-
+        
         for (var i = 0; i < playerFilteredBodies.length; i++) {                
+            if (playerFilteredBodies[i].name === "player") {
                 playerFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
                 playerFilteredBodies[i].name = "explosion";
 
@@ -181,6 +181,7 @@ Game.prototype = {
 
                 playerFilteredBodies[i].size.x = playerFilteredBodies[i].size.x * 2.5;
                 playerFilteredBodies[i].size.y = playerFilteredBodies[i].size.y * 2.5;
+            }
         }
 
         var notCollingWithAnything = function(b1) {
