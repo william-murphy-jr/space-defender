@@ -137,20 +137,24 @@ Game.prototype = {
             return tempBodies.filter(function(b2) { return colliding(b1, b2); }).length > 0; 
         };
 
-        tempBodies = tempBodies.filter(isCollingWithSomething);
-
-        tempBodies = tempBodies.filter(function(unknownBody) {
-            return (unknownBody instanceof Invader) || (unknownBody instanceof Player);
+        let filteredBodies = tempBodies.filter(isCollingWithSomething);
+        
+        let invaderFilteredBodies = filteredBodies.filter(function(unknownBody) {
+            return unknownBody instanceof Invader;
         });
 
-        for (var i = 0; i < tempBodies.length; i++) {
-            if (tempBodies[i].name === "invader" || tempBodies[i].name === "player") {
-                if (tempBodies[i].name === "invader" ) {
+        let playerFilteredBodies = filteredBodies.filter(function(unknownBody) {
+            return unknownBody instanceof Player;
+        });
+
+        for (var i = 0; i < invaderFilteredBodies.length; i++) {
+            if (invaderFilteredBodies[i].name === "invader" || invaderFilteredBodies[i].name === "player") {
+                if (invaderFilteredBodies[i].name === "invader" ) {
                     this.score += 100 * (this.getLevel() + 1);
                 }
                 // console.log("score: ", this.score);
-                tempBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
-                tempBodies[i].name = "explosion";
+                invaderFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
+                invaderFilteredBodies[i].name = "explosion";
 
                 try {
                     this.explosionSound.load();
@@ -159,9 +163,24 @@ Game.prototype = {
                     console.log('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
 
-                tempBodies[i].size.x = tempBodies[i].size.x * 2.5;
-                tempBodies[i].size.y = tempBodies[i].size.y * 2.5;
+                invaderFilteredBodies[i].size.x = invaderFilteredBodies[i].size.x * 2.5;
+                invaderFilteredBodies[i].size.y = invaderFilteredBodies[i].size.y * 2.5;
             }
+        }
+
+        for (var i = 0; i < playerFilteredBodies.length; i++) {                
+                playerFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages);
+                playerFilteredBodies[i].name = "explosion";
+
+                try {
+                    this.explosionSound.load();
+                    this.explosionSound.play();
+                } catch (error) {
+                    console.log('Error with loading & playing sound: ', error); // pass exception object to error handler
+                }
+
+                playerFilteredBodies[i].size.x = playerFilteredBodies[i].size.x * 2.5;
+                playerFilteredBodies[i].size.y = playerFilteredBodies[i].size.y * 2.5;
         }
 
         var notCollingWithAnything = function(b1) {
@@ -186,10 +205,11 @@ Game.prototype = {
             // this.radar = true;
         }
 
+        const allFilteredBodies = [...invaderFilteredBodies, ...playerFilteredBodies];
         // Add bodies back with explosion
-       if (tempBodies.length > 0) {     
-            for (var j = 0; j < tempBodies.length; j++) {
-                this.bodies.push(tempBodies[j]);
+        if (allFilteredBodies.length > 0) {     
+            for (var j = 0; j < allFilteredBodies.length; j++) {
+                this.bodies.push(allFilteredBodies[j]);
             }
         }
 
@@ -227,7 +247,7 @@ Game.prototype = {
         for (var idx = 0; idx < this.bodies.length; idx++) {
             this.bodies[idx].update(time);
         }
-    },
+    },  // update
 
     draw: function(screen, gameSize) {
         screen.clearRect(0, 0, gameSize.x, gameSize.y);
