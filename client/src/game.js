@@ -189,7 +189,7 @@ Game.prototype = {
                     this.explosionSound.load();
                     this.explosionSound.play();
                 } catch (error) {
-                    console.log('Error with loading & playing sound: ', error); // pass exception object to error handler
+                    console.error();('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
 
                 const imagesSizeMultiplier = this.playerLivesLeft ? 2.5 : 6.0;
@@ -325,8 +325,9 @@ Game.prototype = {
         key = undefined;
 
         switch (e.keyCode) {
-            case 80: key = 'p';         break;
             case 67: key = 'c';         break;
+            case 80: key = 'p';         break;
+            case 83: key = 's';         break;
         }
 
         listener = game.findKeyListener(key);
@@ -387,26 +388,18 @@ Game.prototype = {
     },
 
     over: function() {
-        console.log('inside over function');
-
-
         let highScore = 0,
-        // highScores = this.getHighScores();
         highScores = [{score: 100}, {score: 75} , {score: 50}];
 
         let lastOnList = $('#highScoreList li').last().text(); 
-        console.log('lastOnList: ', lastOnList);
 
         if (highScores.length === 0 || game.score > highScores[0].score) {
             // this.showHighScores();
-            console.log('Insert highScoreToast');
             game.highScoreToast.insertAfter('canvas');
             game.highScoreToast.show(); 
             $('#highScoreParagraph').html(game.score);
 
         } else {
-            // $('#gameOverToast').show();
-            console.log('Insert gameOverToast');
             game.gameOverToast.insertAfter('canvas');
             game.gameOverToast.show();
             $('#highScoreParagraph').html(game.score);
@@ -566,7 +559,7 @@ Player.prototype = {
                 this.game.shootSound.play();
             } 
             catch(error) {
-                console.log('Error loading sound: ', error);
+                console.error('Error loading sound: ', error);
             }
         }
     },
@@ -629,7 +622,7 @@ Invader.prototype = {
                 this.game.alienShootSound.load();
                 this.game.alienShootSound.play();
             } catch (error) {
-                console.log('Error adding alienShootSound: ', error);
+                console.error('Error adding alienShootSound: ', error);
             }
         }
     },
@@ -903,15 +896,14 @@ const colliding = function(b1, b2) {
 };
 
 const togglePaused = function() {
-    console.log('togglePaused: ', game.pausedToast);
     if (!this.paused) {
-        game.pausedToast.insertAfter('canvas');
-        game.pausedToast.show();        
+        game.pausedToast && game.pausedToast.insertAfter('canvas');
+        game.pausedToast && game.pausedToast.show();        
     } else {
         $('#pausedToast').detach();
     }
         this.paused = !this.paused;
-    };
+};
 
 const loadSound = function(url, callback) {
     const loaded = function() {
@@ -1033,7 +1025,15 @@ CycleImages.prototype = {
 };
 
 
-// We store level data here in an object
+/* We store level data here in an array of  objects
+ * @speedX - speed of Invaders
+ * @behavior - what pattern do the Invader take on the screen
+ * @row & @col how many are on the screen 
+ * @backgroundImg placeholder obj for background image.
+ * @invaderFireRate only small percentage is needed > 10%
+ * @invaderHits number of hits to kill an Invader -- For future use.
+*/
+// TODO: Make this a DB Mongo, MySql, or Postgres call who knows???
 const levelData = [
     {   speedX: 0.0020,
         behavior: sineWave,
@@ -1086,6 +1086,14 @@ game.addKeyListener({key: 'c', listener: function() {
     game.player.center = { x: game.gameSize.x / 2, y: game.gameSize.y - 1.0 * game.player.size.y };
 }});
 
+// THE Hyperspace button to to get out of a TOUGH JAM?
+// Maybe LOL!!! It is random positioning
+// Had to use "s" as "h" my preferred key and "x" are
+// somehow intercepted by the browser.
+game.addKeyListener({key: 's', listener: function() {
+    game.player.center = { x: game.gameSize.x * Math.random(), y: game.gameSize.y * Math.random() - game.player.size.y};
+}});
+
 game.addKeyListener({ key: 'spacebar',  listener: function() {
             // reset counter for bullets
             // When spacebar comes up
@@ -1098,7 +1106,6 @@ game.addKeyListener({ key: 'spacebar',  listener: function() {
                 window.location.reload();
             }
             if (game.paused && !self.gameOver) {
-                console.log('togglePaused: ', game.paused)
                 game.togglePaused();
             }
 
@@ -1121,7 +1128,6 @@ game.addKeyListener({ key: 'down arrow',  listener: function() {
 }});
 
 $('#pausedToast').on('click', function(e){
-    console.log('pausedToast')
     game.togglePaused();
 });
 
@@ -1131,12 +1137,10 @@ $('.newGameButton, .closeHighScoreToast').on('click', function (e) {
     // game.reset();
     // game.start();
     // window.location.reload(); // inconsistent
-    console.log('Button Pressed!!!')
     window.location.href = window.location.origin;
 });
 
 $('#newGameFromHighScore.newGame').on('click', function (e) {
-    console.log('newGameFromHighScore.newGame clicked!!!')
     window.location.href = window.location.origin;
 });
 
@@ -1218,7 +1222,7 @@ $(window).on('focus', function() {
             game.levelData[3].backgroundImg = game.getImage("/images/Space_1.jpg");
 
             // Load Explosion Images
-            // These are inline/unrolled for faster loading
+            // These are inline/loop-unrolled for faster loading
             game.tmp1 = game.getImage("/images/img/explode_1.png");
             game.tmp2 = game.getImage("/images/img/explode_2.png");
             game.tmp3 = game.getImage("/images/img/explode_3.png");
