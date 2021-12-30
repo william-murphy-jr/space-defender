@@ -324,6 +324,7 @@ Game.prototype = {
 
         switch (e.keyCode) {
             case 80: key = 'p';         break;
+            case 67: key = 'c';         break;
         }
 
         listener = game.findKeyListener(key);
@@ -1075,8 +1076,11 @@ var game = new Game("Defender", "screen");
 
 game.addKeyListener({ key: 'p', listener: function() {
         game.togglePaused();
-        }
-});
+}});
+
+game.addKeyListener({key: 'c', listener: function() {
+    game.player.center = { x: game.gameSize.x / 2, y: game.gameSize.y - 1.0 * game.player.size.y };
+}});
 
 game.addKeyListener({ key: 'spacebar',  listener: function() {
             // reset counter for bullets
@@ -1094,28 +1098,23 @@ game.addKeyListener({ key: 'spacebar',  listener: function() {
                 game.togglePaused();
             }
 
-        }
-});
+}});
 
 // Reset these when the arrow keys come UP
 game.addKeyListener({ key: 'left arrow',  listener: function() {
             game.player.step_X = 4;
-        }
-});
+}});
 
 game.addKeyListener({ key: 'right arrow',  listener: function() {
             game.player.step_X = 4;
-        }
-});
+}});
 game.addKeyListener({ key: 'up arrow',  listener: function() {
             game.player.step_Y = 4;
-        }
-});
+}});
 
 game.addKeyListener({ key: 'down arrow',  listener: function() {
             game.player.step_Y = 4;
-        }
-});
+}});
 
 $('#pausedToast').on('click', function(e){
     console.log('pausedToast')
@@ -1140,14 +1139,12 @@ $('#newGameFromHighScore.newGame').on('click', function (e) {
 $(window).on('blur', function() {
     if (!game.gameOver && !game.paused) {
         game.togglePaused();
-    }
-});
+}});
 
 $(window).on('focus', function() {
     if (game.paused) {
         game.togglePaused();
-    }
-});
+}});
     
     // Queue Images here
 
