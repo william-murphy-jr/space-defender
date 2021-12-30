@@ -39,7 +39,8 @@ console.warn("Defender Running ...");
         this.levelData  = levelData;
 
         this.player = {};
-        this.playerCachedCopy = {};
+        this.playerLivesLeft = 3;
+        this.playerStatus = 'ALIVE';  // ALIVE | DEAD
         this.radar = false;
 
         this.imageLoadingProgressCallback = {};
@@ -99,6 +100,7 @@ console.warn("Defender Running ...");
                     self.update(time);
                     self.draw(self.screen, self.gameSize);
                     self.drawScore();
+                    self.drawLivesLeft();
                     requestAnimationFrame(self.animate);
                 }
         };
@@ -140,7 +142,7 @@ Game.prototype = {
         const invaderFilteredBodies = [];
         const playerFilteredBodies = [];
 
-        // Filter w/o using a slower array filter method
+        // Filter for both w/o using much slower array filter method
         for (let i = 0; i < filteredBodies.length; i++) {
             const unknownFilteredBody = filteredBodies[i];
 
@@ -156,8 +158,7 @@ Game.prototype = {
         for (let i = 0; i < invaderFilteredBodies.length; i++) {
             if (invaderFilteredBodies[i].name === "invader") {
                 this.score += 100 * (this.getLevel() + 1);
-                
-                // console.log("score: ", this.score);
+
                 invaderFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages, 'Invader');
                 invaderFilteredBodies[i].name = "explosion";
                 
@@ -172,11 +173,13 @@ Game.prototype = {
                 invaderFilteredBodies[i].size.y = invaderFilteredBodies[i].size.y * 2.5;
             }
         }
-        
+
         for (let i = 0; i < playerFilteredBodies.length; i++) {
-            this.playerCachedCopy = _.cloneDeep(playerFilteredBodies[i]);
-            console.log('this.playerCachedCopy: ', this.playerCachedCopy);
             if (playerFilteredBodies[i].name === "player") {
+                if (this.playerStatus === 'ALIVE') {
+                    this.playerStatus = 'DEAD';
+                    this.playerLivesLeft--;
+                }
                 playerFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages, 'Player');
                 playerFilteredBodies[i].name = "explosion";
 
@@ -187,8 +190,10 @@ Game.prototype = {
                     console.log('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
 
-                playerFilteredBodies[i].size.x = playerFilteredBodies[i].size.x * 2.5;
-                playerFilteredBodies[i].size.y = playerFilteredBodies[i].size.y * 2.5;
+                const playerImageMultiplier = this.playerLivesLeft ? 2.5 : 6.0
+
+                playerFilteredBodies[i].size.x = playerFilteredBodies[i].size.x * playerImageMultiplier;
+                playerFilteredBodies[i].size.y = playerFilteredBodies[i].size.y * playerImageMultiplier;
             }
         }
 
@@ -230,21 +235,16 @@ Game.prototype = {
              return theBody.remove === false;
         }); 
 
-        const isPlayerAlive = this.bodies.filter(function(unknownBody) {
-            return unknownBody instanceof Player;
-        });
-
-        // this.drawScore();
-
-        if (isPlayerAlive.length < 1) {
+        if (this.playerLivesLeft < 1) {
             //delay game over to let animation finish
             setTimeout(function() {
                 this.gameOver = true;
             }, 750);
         }
 
-        if (invadersLeftAlive.length <= 0 && isPlayerAlive.length > 0) {
+        if (invadersLeftAlive.length <= 0 && this.playerLivesLeft > 0) {
             this.paused = true;     
+            this.playerLivesLeft < 8 ? this.playerLivesLeft++ : this.playerLivesLeft;
             this.incrementLevel();
             setTimeout(function() {
                 this.game.loadLevel();
@@ -435,7 +435,15 @@ Game.prototype = {
         this.screen.fillText(text, this.gameSize.x * 0.075, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
         var fontHeight = this.gameSize.y * 0.0375;
-        // var fontHeight = 24;
+        this.screen.font = fontHeight + "px Helvetica";
+        this.screen.textAlign = 'left';
+        this.screen.textBaseline = 'top';
+    },
+    drawLivesLeft: function() {
+        var text = 'Lives: ' + this.playerLivesLeft;
+        this.screen.fillText(text, this.gameSize.x * 0.850, this.gameSize.y * 0.050);
+        this.screen.fillStyle = 'white';
+        var fontHeight = this.gameSize.y * 0.0375;
         this.screen.font = fontHeight + "px Helvetica";
         this.screen.textAlign = 'left';
         this.screen.textBaseline = 'top';
@@ -655,6 +663,8 @@ var createInvaders = function(game, gameSize, behavior, invaderImage, row, col) 
 var getSpriteSize = function(spriteName, gameSize){
     var size = {};
 
+    // TOTO: Clean this up and figure out what kind oa screen the user has open
+    // 4:3 16:9 : 21:9 etc. and scale the images from there.
     if (spriteName === 'player') {
         if (gameSize.x > 1400) {
             size = { x: gameSize.x * 0.050, y: gameSize.x * 0.0750 }; 
@@ -949,25 +959,34 @@ SpritePainter.prototype = {
     }
 };
 
-var ExplosionSpritePainter = function(images, instanceFor) {
+var ExplosionSpritePainter = function(images, kindOfBody) {
     this.images = images;
     this.imagesIndex = 0;
-    this.instanceFor = instanceFor ? instanceFor : null;
+    this.kindOfBody = kindOfBody ? kindOfBody : null;
 };
 
 ExplosionSpritePainter.prototype = {
     advance: function(body) {
+        // Last image so reset everything here
         if (this.imagesIndex === this.images.length - 1) {
-            if  (this.instanceFor === 'Invader') {
+            if  (this.kindOfBody === 'Invader') {
                 body.remove = true;
                 body.visible = false;
                 body.animating = false;
 
-            // } else if  (this.instanceFor === 'Player') {
-            //     body.remove = false;
-            //     body.visible = true;
-            //     body.animating = false;
+            } else if (this.kindOfBody === 'Player') {
+                body.remove = false;
+                body.visible = true;
+                body.animating = false;
+                body.name = 'player';
+                body.size.x /= game.playerLivesLeft ? 2.5 : 6.0;
+                body.size.y /= game.playerLivesLeft ? 2.5 : 6.0;
 
+                // Player still alive then put them back on the canvas
+                if (game.playerLivesLeft > 0 && game.playerStatus === 'DEAD') {
+                    body.painter = new SpritePainter([game.playerImg]);
+                    game.playerStatus = 'ALIVE';
+                }
             } else {
                 body.remove = true;
                 body.visible = false;
@@ -985,9 +1004,9 @@ ExplosionSpritePainter.prototype = {
             screen.drawImage(spriteImage, body.center.x - body.size.x / 2,
             body.center.y - body.size.y / 2, body.size.x, body.size.y);
         }
-        catch (e) {
+        catch (error) {
            // statements to handle any exceptions
-           // console.log(e); // pass exception object to error handler
+           console.warn('Error writing spite to screen ', error); // pass exception object to error handler
         }
 
     }
@@ -1057,7 +1076,7 @@ var game = new Game("Defender", "screen");
 game.addKeyListener({ key: 'p', listener: function() {
         game.togglePaused();
         }
-    });
+});
 
 game.addKeyListener({ key: 'spacebar',  listener: function() {
             // reset counter for bullets
@@ -1076,27 +1095,27 @@ game.addKeyListener({ key: 'spacebar',  listener: function() {
             }
 
         }
-    });
+});
 
 // Reset these when the arrow keys come UP
 game.addKeyListener({ key: 'left arrow',  listener: function() {
             game.player.step_X = 4;
         }
-    });
+});
 
 game.addKeyListener({ key: 'right arrow',  listener: function() {
             game.player.step_X = 4;
         }
-    });
+});
 game.addKeyListener({ key: 'up arrow',  listener: function() {
             game.player.step_Y = 4;
         }
-    });
+});
 
 game.addKeyListener({ key: 'down arrow',  listener: function() {
             game.player.step_Y = 4;
         }
-    });
+});
 
 $('#pausedToast').on('click', function(e){
     console.log('pausedToast')
@@ -1235,6 +1254,7 @@ $('#scoreToast').removeClass('hide');
 $('#progressbar').removeClass('hide');
 $('#gameOverToast').removeClass('hide');
 $('#highScoreToast').removeClass('hide');
+$('#playerLivesLeftToast').removeClass('hide');
 
 // detach but save HTML snippet
 game.loadingToast = $('#loadingToast').detach();
@@ -1242,6 +1262,7 @@ game.pausedToast = $('#pausedToast').detach();
 game.progressbar = $('#progressbar').detach();
 game.gameOverToast = $('#gameOverToast').detach();
 game.highScoreToast = $('#highScoreToast').detach();
+game.playerLivesLeftToast = $('#playerLivesLeftToast').detach();
 
 
 $('#screen').show();
