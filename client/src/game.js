@@ -100,6 +100,7 @@ console.warn("Defender Running ...");
                     self.update(time);
                     self.draw(self.screen, self.gameSize);
                     self.drawScoreBox();
+                    self.drawLevelBox();
                     self.drawLivesLeftBox();
                     requestAnimationFrame(self.animate);
                 }
@@ -429,6 +430,16 @@ Game.prototype = {
     drawScoreBox: function() {
         let text = 'SCORE: ' + this.score;
         this.screen.fillText(text, this.gameSize.x * 0.075, this.gameSize.y * 0.050);
+        this.screen.fillStyle = 'white';
+        let fontHeight = this.gameSize.y * 0.0375;
+        this.screen.font = fontHeight + "px Helvetica";
+        this.screen.textAlign = 'left';
+        this.screen.textBaseline = 'top';
+    },
+    drawLevelBox: function() {
+        const playerLevel = this.level + 1;
+        let text = 'Level: ' + playerLevel;
+        this.screen.fillText(text, this.gameSize.x * 0.49, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
         let fontHeight = this.gameSize.y * 0.0375;
         this.screen.font = fontHeight + "px Helvetica";
