@@ -1,17 +1,17 @@
 // space_defender.js
 
-// Break into Modules
-// TODO Fix Audio Play Error 
+// TODO: Break into Modules
+// TODO Fix Audio Play Error
 // See https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
 
 console.warn("Defender Running ...");
 
-    var Game = function(gameName, canvasId) {
-        var canvas = document.getElementById(canvasId);
+    const Game = function(gameName, canvasId) {
+        const  canvas = document.getElementById(canvasId);
         console.log("gameName: ", gameName);
 
-        var width = $(window).width();
-        var height = $(window).height();
+        const  width = $(window).width();
+        const  height = $(window).height();
 
         console.log("width: ", width);
         console.log("height: ", height);
@@ -21,7 +21,7 @@ console.warn("Defender Running ...");
 
         this.screen = canvas.getContext('2d');
         this.gameSize = { x: canvas.width, y: canvas.height };
-        var self = this;
+        const  self = this;
 
         this. keyListeners = [];
 
@@ -88,7 +88,7 @@ console.warn("Defender Running ...");
                     // show Game Over Dialog Box Here!!
                     this.gameOver = false;
                     game.over();
-                    console.log("gameOver: ************");
+                    console.log("***** gameOver: *****");
                  return;
                 }
 
@@ -99,8 +99,8 @@ console.warn("Defender Running ...");
                 } else { 
                     self.update(time);
                     self.draw(self.screen, self.gameSize);
-                    self.drawScore();
-                    self.drawLivesLeft();
+                    self.drawScoreBox();
+                    self.drawLivesLeftBox();
                     requestAnimationFrame(self.animate);
                 }
         };
@@ -111,7 +111,7 @@ console.warn("Defender Running ...");
 Game.prototype = {
 
     start: function() {
-        var self = this;
+        const  self = this;
         this.loadLevel(this.level);
         this.animate();
     },
@@ -142,7 +142,8 @@ Game.prototype = {
         const invaderFilteredBodies = [];
         const playerFilteredBodies = [];
 
-        // Filter for both w/o using much slower array filter method
+        // Filter for both using 'for loop'
+        // This is much faster than the slower array filter method
         for (let i = 0; i < filteredBodies.length; i++) {
             const unknownFilteredBody = filteredBodies[i];
 
@@ -176,12 +177,13 @@ Game.prototype = {
 
         for (let i = 0; i < playerFilteredBodies.length; i++) {
             if (playerFilteredBodies[i].name === "player") {
+                // If player is still alive set him to dead he just got killed LOL
                 if (this.playerStatus === 'ALIVE') {
                     this.playerStatus = 'DEAD';
                     this.playerLivesLeft--;
                 }
-                playerFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages, 'Player');
                 playerFilteredBodies[i].name = "explosion";
+                playerFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages, 'Player');
 
                 try {
                     this.explosionSound.load();
@@ -190,10 +192,10 @@ Game.prototype = {
                     console.log('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
 
-                const playerImageMultiplier = this.playerLivesLeft ? 2.5 : 6.0
+                const imagesSizeMultiplier = this.playerLivesLeft ? 2.5 : 6.0;
 
-                playerFilteredBodies[i].size.x = playerFilteredBodies[i].size.x * playerImageMultiplier;
-                playerFilteredBodies[i].size.y = playerFilteredBodies[i].size.y * playerImageMultiplier;
+                playerFilteredBodies[i].size.x = playerFilteredBodies[i].size.x * imagesSizeMultiplier;
+                playerFilteredBodies[i].size.y = playerFilteredBodies[i].size.y * imagesSizeMultiplier;
             }
         }
 
@@ -261,19 +263,19 @@ Game.prototype = {
         screen.clearRect(0, 0, gameSize.x, gameSize.y);
         screen.drawImage(this.backgroundImg, 0, 0, gameSize.x, gameSize.y);
         
-        for (var i = 0; i < this.bodies.length; i++) {
+        for (let i = 0; i < this.bodies.length; i++) {
             this.bodies[i].draw(this.screen, this.bodies[i]);
         }
     },
 
     loadLevel: function() {
         console.log(" \n *** Loading level Number " + this.level + " ***");
-        var level = this.getLevel();
-        var level_data = this.levelData[level];
-        var row = level_data.row;
-        var col = level_data.col;
-        var behavior = level_data.behavior;
-        var invaderImage = level_data.invaderImage;
+        const  level = this.getLevel();
+        const  level_data = this.levelData[level];
+        const  row = level_data.row;
+        const  col = level_data.col;
+        const  behavior = level_data.behavior;
+        const  invaderImage = level_data.invaderImage;
 
         this.radar = false;
 
@@ -307,10 +309,10 @@ Game.prototype = {
     },
 
     findKeyListener: function(key) {
-        var listener;
+        let listener;
 
         game.keyListeners.forEach(function(keyAndListener) {
-            var currentKey = keyAndListener.key;
+            const  currentKey = keyAndListener.key;
             if (currentKey === key) {
                 listener = keyAndListener.listener;
             }
@@ -319,7 +321,7 @@ Game.prototype = {
     },
 
     keyPressed: function(e) {
-        var listener;
+        let listener;
         key = undefined;
 
         switch (e.keyCode) {
@@ -334,7 +336,7 @@ Game.prototype = {
     },
 
     keyUp: function(e) {
-        var listener;
+        let listener;
         key = undefined;
 
         switch (e.keyCode) {
@@ -364,7 +366,7 @@ Game.prototype = {
     },
 
     getHighScores: function() {
-        var key = game.gameName + game.HIGH_SCORES_SUFFIX,
+        let key = game.gameName + game.HIGH_SCORES_SUFFIX,
         highScoresString = localStorage[key];
         if (highScoresString === undefined) {
             localStorage[key] = JSON.stringify([]);
@@ -373,7 +375,7 @@ Game.prototype = {
     },
 
     setHighScore: function() {
-        var key = gameName + game.HIGH_SCORES_SUFFIX,
+        let key = gameName + game.HIGH_SCORES_SUFFIX,
         highScoresString = localStorage;
 
         highScores.unshift(highScore);
@@ -388,11 +390,11 @@ Game.prototype = {
         console.log('inside over function');
 
 
-        var highScore = 0,
+        let highScore = 0,
         // highScores = this.getHighScores();
         highScores = [{score: 100}, {score: 75} , {score: 50}];
 
-        var lastOnList = $('#highScoreList li').last().text(); 
+        let lastOnList = $('#highScoreList li').last().text(); 
         console.log('lastOnList: ', lastOnList);
 
         if (highScores.length === 0 || game.score > highScores[0].score) {
@@ -424,27 +426,27 @@ Game.prototype = {
         this.updateHighScoreList();
     },
     updateHighScoreList: function() {
-        var el,
+        let el,
             highScores = game.getHighScores(),
             length = highScores.length,
             highScore,
             listParent = highScoreList.parentNode;  
 
     },
-    drawScore: function() {
-        var text = 'SCORE: ' + this.score;
+    drawScoreBox: function() {
+        let text = 'SCORE: ' + this.score;
         this.screen.fillText(text, this.gameSize.x * 0.075, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
-        var fontHeight = this.gameSize.y * 0.0375;
+        let fontHeight = this.gameSize.y * 0.0375;
         this.screen.font = fontHeight + "px Helvetica";
         this.screen.textAlign = 'left';
         this.screen.textBaseline = 'top';
     },
-    drawLivesLeft: function() {
-        var text = 'Lives: ' + this.playerLivesLeft;
+    drawLivesLeftBox: function() {
+        let text = 'Lives: ' + this.playerLivesLeft;
         this.screen.fillText(text, this.gameSize.x * 0.850, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
-        var fontHeight = this.gameSize.y * 0.0375;
+        let fontHeight = this.gameSize.y * 0.0375;
         this.screen.font = fontHeight + "px Helvetica";
         this.screen.textAlign = 'left';
         this.screen.textBaseline = 'top';
@@ -453,17 +455,17 @@ Game.prototype = {
 }; // end Game.prototype
 
 
-var imageLoadedCallback =  function(e) {
+const imageLoadedCallback =  function(e) {
         this.imagesLoaded++;
     };
 
-var imageLoadErrorCallback = function(e){
+const imageLoadErrorCallback = function(e){
         this.imagesFailedToLoad++;
     };
 
-var loadImage = function(imageUrl) {
-        var image = new Image();
-        var self = this;
+const loadImage = function(imageUrl) {
+        let image = new Image();
+        const self = this;
 
         image.src = imageUrl;
 
@@ -478,7 +480,7 @@ var loadImage = function(imageUrl) {
         this.images[imageUrl] = image;      
     };
 
-var loadImages = function() {
+const loadImages = function() {
         if (this.imagesIndex < this.imageUrls.length){
             this.loadImage(this.imageUrls[this.imagesIndex]);
             this.imagesIndex++;
@@ -489,15 +491,15 @@ var loadImages = function() {
     };
 
     // Call to add image to queue
-var queueImage = function(imageUrl) {
+const queueImage = function(imageUrl) {
         this.imageUrls.push(imageUrl);
     };
 
-var getImage = function(imageUrl) {
+const getImage = function(imageUrl) {
         return  this.images[imageUrl];
     };
     
-var Player = function(game, behavior, painter, gameSize) {
+const Player = function(game, behavior, painter, gameSize) {
     this.name = "player";
     this.gameSize = gameSize;
     this.behavior = behavior;
@@ -519,7 +521,7 @@ Player.prototype = {
     update: function(time) {
 
         //Loop through all behaviors
-        for (var i = 0; i < this.behavior.length; i++) {
+        for (let i = 0; i < this.behavior.length; i++) {
             this.behavior[i].execute(this, this.gameSize, time);
         }
 
@@ -552,7 +554,7 @@ Player.prototype = {
             this.game.bulletCntr--;
             this.game.gun_Locked = this.game.bulletCntr <= 0 ? true : false;
 
-            var missle = new Missle({ x: this.center.x, y: this.center.y - 
+            let missle = new Missle({ x: this.center.x, y: this.center.y - 
                 this.size.y / 2}, { x: 0, y: -this.gameSize.y * 0.0150 }, 
                 this.gameSize);
             this.game.score -= 5;
@@ -573,7 +575,7 @@ Player.prototype = {
         }   
 };
 
-var Invader = function(game, center, behavior, painter, gameSize) {
+const Invader = function(game, center, behavior, painter, gameSize) {
     this.name = "invader";
     this.game = game;
     this.gameSize = gameSize;
@@ -599,9 +601,9 @@ var Invader = function(game, center, behavior, painter, gameSize) {
 Invader.prototype = {
     update: function(time) {
 
-        var targetLocation = {};
+        let targetLocation = {};
 
-        for (var i = 0; i < this.behavior.length; i++) {
+        for (let i = 0; i < this.behavior.length; i++) {
             this.behavior[i].execute(this, this.gameSize, time);
         }
 
@@ -618,7 +620,7 @@ Invader.prototype = {
                 targetLocation = { x: 0, y: this.gameSize.y * 0.0075 };
             }
 
-            var bullet = new Bullet({ x: this.center.x, y: this.center.y + 
+            let bullet = new Bullet({ x: this.center.x, y: this.center.y + 
                 this.size.x / 2}, targetLocation, 
                 this.gameSize);
             this.game.addBody(bullet);
@@ -636,9 +638,9 @@ Invader.prototype = {
     }   
 };
 
-var createInvaders = function(game, gameSize, behavior, invaderImage, row, col) {
+const createInvaders = function(game, gameSize, behavior, invaderImage, row, col) {
     this.game = game;
-    var invaders = [],
+    let invaders = [],
         fleetWidth = 0,
         size = {};
 
@@ -649,10 +651,10 @@ var createInvaders = function(game, gameSize, behavior, invaderImage, row, col) 
 
     // console.log("this.game.fleetPatrol_X: ",this.game.fleetPatrol_X);
 
-    for (var i = 0; i < (row * col); i++) {
+    for (let i = 0; i < (row * col); i++) {
 
-        var x = (this.game.fleetPatrol_X) + (i % col) * (gameSize.x * 0.075);
-        var y = (gameSize.y * 0.075) + (i % row) * (gameSize.y * 0.075);
+        let x = (this.game.fleetPatrol_X) + (i % col) * (gameSize.x * 0.075);
+        let y = (gameSize.y * 0.075) + (i % row) * (gameSize.y * 0.075);
 
         invaders.push(new Invader(game, { x: x, y: y }, [behavior, 
             new CycleImages(16, 32)], new SpritePainter([invaderImage]), gameSize));
@@ -661,10 +663,10 @@ var createInvaders = function(game, gameSize, behavior, invaderImage, row, col) 
     return invaders;
 };
 
-var getSpriteSize = function(spriteName, gameSize){
-    var size = {};
+const getSpriteSize = function(spriteName, gameSize){
+    let size = {};  // not const
 
-    // TOTO: Clean this up and figure out what kind oa screen the user has open
+    // TODO: Clean this up and figure out what kind oa screen the user has open
     // 4:3 16:9 : 21:9 etc. and scale the images from there.
     if (spriteName === 'player') {
         if (gameSize.x > 1400) {
@@ -721,7 +723,7 @@ var getSpriteSize = function(spriteName, gameSize){
 };
 
 // Movements the aliens take
-var rightToLeft = {
+const rightToLeft = {
 
     execute: function(body, gameSize) {
 
@@ -738,7 +740,7 @@ var rightToLeft = {
 };
 
 // Aliens will follow a  sinewave or snake patternp  
-var sineWave = {
+const sineWave = {
 
     execute: function(body, gameSize) {
         // console.log("In sineWave execute's this: %j", body)
@@ -760,7 +762,7 @@ var sineWave = {
     }
 };
 
-var halfCircle = {
+const halfCircle = {
 
     execute: function(body, gameSize) {
 
@@ -780,7 +782,7 @@ var halfCircle = {
     }
 };
 
-var dropDiagnal = {
+const dropDiagonal = {
 
     execute: function(body, gameSize) {
 
@@ -799,7 +801,7 @@ var dropDiagnal = {
     }
 };
 
-var Bullet = function(center, velocity, gameSize) {
+const Bullet = function(center, velocity, gameSize) {
     this.gameSize = gameSize;
     this.center = center;
     this.velocity = velocity;
@@ -829,7 +831,7 @@ Bullet.prototype = {
     }
 };
 
-var Missle = function(center, velocity, gameSize) {
+const Missle = function(center, velocity, gameSize) {
     this.gameSize = gameSize;
     // this.size = { x: 15, y: 25 };
     this.size = getSpriteSize('missle', gameSize);
@@ -860,8 +862,8 @@ Missle.prototype = {
     }
 };
 
-var Keyboarder = function(game) {
-        var keyState = {};
+const Keyboarder = function(game) {
+        let keyState = {}; // not const
 
         window.onkeydown = function(e){
             keyState[e.keyCode] = true;
@@ -883,7 +885,7 @@ var Keyboarder = function(game) {
 };
 
 // Detect collisions
-var colliding = function(b1, b2) {
+const colliding = function(b1, b2) {
     return !(b1 === b2 ||
         (b1 instanceof Player && b2 instanceof Missle)  ||
         (b1 instanceof Missle && b2 instanceof Player)  ||
@@ -900,7 +902,7 @@ var colliding = function(b1, b2) {
         b1.center.y - b1.size.y / 2 > b2.center.y + b2.size.y / 2);
 };
 
-var togglePaused = function() {
+const togglePaused = function() {
     console.log('togglePaused: ', game.pausedToast);
     if (!this.paused) {
         game.pausedToast.insertAfter('canvas');
@@ -911,24 +913,24 @@ var togglePaused = function() {
         this.paused = !this.paused;
     };
 
-var loadSound = function(url, callback) {
-    var loaded = function() {
+const loadSound = function(url, callback) {
+    const loaded = function() {
         callback(sound);
         sound.removeEventListener('canplaythrough', loaded);
     };
 
-var sound = new Audio(url);
+const sound = new Audio(url);
     sound.addEventListener('canplaythrough', loaded);
     sound.load();
 };
 
-var SpritePainter = function(images) {
+const SpritePainter = function(images) {
     this.images = images;
     this.imagesIndex = 0;
 };
 
-var radarGuidance = function(shooter, target, velocity) {
-    var rev = -1,
+const radarGuidance = function(shooter, target, velocity) {
+    let rev = -1,
         dx = shooter.center.x - target.center.x,
         dy = shooter.center.y - target.center.y,
         theta = Math.atan(dy / dx);
@@ -938,7 +940,7 @@ var radarGuidance = function(shooter, target, velocity) {
     else if (target.center.x < shooter.center.x && target.center.y < 
         shooter.center.y) rev = 1;
 
-    var velocity_Dx = rev * velocity * Math.cos(theta),
+    let velocity_Dx = rev * velocity * Math.cos(theta),
         velocity_Dy = rev * velocity * Math.sin(theta);
 
     return {x: velocity_Dx, y: velocity_Dy};
@@ -953,14 +955,14 @@ SpritePainter.prototype = {
         }
     },
     draw: function(screen, body) {
-        var spriteImage = this.images[this.imagesIndex];
+        let spriteImage = this.images[this.imagesIndex];
 
         screen.drawImage(spriteImage, body.center.x - body.size.x / 2,
         body.center.y - body.size.y / 2, body.size.x, body.size.y);
     }
 };
 
-var ExplosionSpritePainter = function(images, kindOfBody) {
+const ExplosionSpritePainter = function(images, kindOfBody) {
     this.images = images;
     this.imagesIndex = 0;
     this.kindOfBody = kindOfBody ? kindOfBody : null;
@@ -998,7 +1000,7 @@ ExplosionSpritePainter.prototype = {
         }
     },
     draw: function(screen, body) {
-        var spriteImage = this.images[this.imagesIndex];
+       let spriteImage = this.images[this.imagesIndex];
         body.animating = true;
 
         try {
@@ -1013,7 +1015,7 @@ ExplosionSpritePainter.prototype = {
     }
 };
 
-var CycleImages = function(frameCnt, PAGE_FLIP_INTERVAL) {
+const CycleImages = function(frameCnt, PAGE_FLIP_INTERVAL) {
     this.frameCounter = 0;
     this.frameCnt = frameCnt;
     this.lastAdvance = 0;
@@ -1032,7 +1034,7 @@ CycleImages.prototype = {
 
 
 // We store level data here in an object
-var levelData = [
+const levelData = [
     {   speedX: 0.0020,
         behavior: sineWave,
         invaderImage: {}, 
@@ -1061,7 +1063,7 @@ var levelData = [
         invaderHits: 1
     },
     {   speedX: 0.00225,
-        behavior: dropDiagnal,
+        behavior: dropDiagonal,
         invaderImage: {}, 
         row: 5,
         col: 7,
@@ -1072,12 +1074,14 @@ var levelData = [
 ];
 
 // We create a new game here
-var game = new Game("Defender", "screen");
+const game = new Game("Defender", "screen");
 
+// Pause the game
 game.addKeyListener({ key: 'p', listener: function() {
         game.togglePaused();
 }});
 
+// Position the Player back at the start
 game.addKeyListener({key: 'c', listener: function() {
     game.player.center = { x: game.gameSize.x / 2, y: game.gameSize.y - 1.0 * game.player.size.y };
 }});
@@ -1186,7 +1190,7 @@ $(window).on('focus', function() {
     /////////////////////////////////////////////
     interval = setInterval(function() {
 
-        var loadingPercentComplete = game.loadImages();
+        let loadingPercentComplete = game.loadImages();
         // console.log('loading Percentage Completed: ', loadingPercentComplete);
 
         if (loadingPercentComplete === 100) {
@@ -1194,26 +1198,27 @@ $(window).on('focus', function() {
             clearInterval(interval);
         }
 
-
-            // We MUST Load Images here 
+            // We MUST Load ALL these Images here
             game.backgroundImg = game.getImage("/images/Space_1_slice.jpg");
             game.playerImg = game.getImage("/images/Starships/starships_0007_Ex-ving.png");
             game.missleImg = game.getImage("/images/missle.png");
             game.enemy_bulletImg = game.getImage("/images/enemy-bullet.png");
 
             // Load Alien ships into level obj's
+            // TODO: Load all but first later
             game.levelData[0].invaderImage = game.getImage("/images/Starships/starships_0006_Bow-fighter_Rev.png");
             game.levelData[1].invaderImage = game.getImage("/images/Starships/starships_0004_Ice-Speedster_Rev.png");
             game.levelData[2].invaderImage = game.getImage("/images/Starships/starships_0005_Centenial-Hawk_Rev.png");
             game.levelData[3].invaderImage = game.getImage("/images/Starships/starships_0001_Sun-killer_Rev.png");
 
-
+            // TODO: Load all but first later
             game.levelData[0].backgroundImg = game.getImage("/images/Space_1_slice.jpg");
             game.levelData[1].backgroundImg = game.getImage("/images/Milky_Way.jpg");
             game.levelData[2].backgroundImg = game.getImage("/images/Galaxy.jpg");
             game.levelData[3].backgroundImg = game.getImage("/images/Space_1.jpg");
 
-            //Load Explosion Images
+            // Load Explosion Images
+            // These are inline/unrolled for faster loading
             game.tmp1 = game.getImage("/images/img/explode_1.png");
             game.tmp2 = game.getImage("/images/img/explode_2.png");
             game.tmp3 = game.getImage("/images/img/explode_3.png");
@@ -1233,7 +1238,7 @@ $(window).on('focus', function() {
 
     }, 16);
     /////////////////////////////////////////////////
-// var loadToastTitle = document.getElementById("loadToastTitle");
+// const loadToastTitle = document.getElementById("loadToastTitle");
 
 // Hide Canvas
 $('#screen').hide();
@@ -1251,16 +1256,13 @@ $('#scoreToast').removeClass('hide');
 $('#progressbar').removeClass('hide');
 $('#gameOverToast').removeClass('hide');
 $('#highScoreToast').removeClass('hide');
-$('#playerLivesLeftToast').removeClass('hide');
 
-// detach but save HTML snippet
+// detach and cache HTML snippet
 game.loadingToast = $('#loadingToast').detach();
 game.pausedToast = $('#pausedToast').detach();
 game.progressbar = $('#progressbar').detach();
 game.gameOverToast = $('#gameOverToast').detach();
 game.highScoreToast = $('#highScoreToast').detach();
-game.playerLivesLeftToast = $('#playerLivesLeftToast').detach();
-
 
 $('#screen').show();
 // loadToastTitle.style.display = "none";
@@ -1270,9 +1272,8 @@ $('#screen').show();
 
 
     game.explosionImages.push( game.tmp1, game.tmp2, game.tmp3, game.tmp4,
-
-    game.tmp5, game.tmp6, game.tmp7, game.tmp8, game.tmp9, game.tmp10,
-    game.tmp11, game.tmp12,game.tmp13, game.tmp14, game.tmp15, game.tmp16 );
+        game.tmp5, game.tmp6, game.tmp7, game.tmp8, game.tmp9, game.tmp10,
+        game.tmp11, game.tmp12,game.tmp13, game.tmp14, game.tmp15, game.tmp16 );
             
     // game.loadLevel(0);
     e.preventDefault();
@@ -1283,4 +1284,4 @@ $('#screen').show();
     }, 250)
 });
 
-var gScore = game.score;
+const gScore = game.score;
