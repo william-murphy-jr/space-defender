@@ -85,14 +85,14 @@
                     <strong>Add My Score</strong>
                 </button>
 
-                <button  id='newGameFromHighScoreButton' class="newGameButton" disabled="true">
-                    <strong>New Game</strong>
+                <button  id='newGameFromHighScoreButton' class="newGameButton highScore">
+                    <strong>Close</strong>
                 </button>
             </form>
 
                 <p id='previousHighScore' class="title">Previous High Scores</p>
 
-            <!-- The following ordered list is popuilated by Handlebars/Pug in the game. -->
+            <!-- The following ordered list is populated by Handlebars/Pug in the game. -->
             <ol id='highScoreList'>
             {{#if players}}
                 {{#each players}}

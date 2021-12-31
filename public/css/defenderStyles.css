@@ -75,6 +75,13 @@ div#loadingToast {
     font-size: 1.25rem;
     font-weight: bold;
 }
+
+#newGameFromHighScoreButton.newGameButton.highScore {
+    margin-top: 1rem;
+}
+.newGameButton {
+    width: 100%;
+}
 #highScoreParagraph{
     text-align: center;
     margin: 1rem auto;
