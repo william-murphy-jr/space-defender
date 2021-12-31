@@ -12,7 +12,7 @@
     "dotenv": "^6.2.0",
     "express": "latest",
     "express3-handlebars": "^0.5.2",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "mongoose": "^5.4.10",
     "morgan": "^1.9.1"
   },
