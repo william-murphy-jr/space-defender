@@ -1,8 +1,9 @@
 // space_defender.js
 
-// TODO: Break into Modules
-// TODO Fix Audio Play Error
-// See https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
+// TODO: Break into Modules Long term goal
+// TODO: Extend Webpack/npm packages to cover all ES2015 - ES2021+ Rules
+// TODO: Fix Audio Play Error 🚨 
+// See 👀 https://developers.google.com/web/updates/2017/06/play-request-was-interrupted 🤔
 
 console.warn("Defender Running ...");
 
@@ -40,7 +41,7 @@ console.warn("Defender Running ...");
 
         this.player = {};
         this.playerLivesLeft = 3;
-        this.playerStatus = 'ALIVE';  // ALIVE | DEAD
+        this.playerStatus = 'ALIVE';  // 'ALIVE' | 'DEAD'
         this.radar = false;
 
         this.imageLoadingProgressCallback = {};
@@ -101,7 +102,7 @@ console.warn("Defender Running ...");
                     self.draw(self.screen, self.gameSize);
                     self.drawScoreBox();
                     self.drawLevelBox();
-                    self.drawLivesLeftBox();
+                    self.drawShipsBox();
                     requestAnimationFrame(self.animate);
                 }
         };
@@ -116,7 +117,8 @@ Game.prototype = {
         this.loadLevel(this.level);
         this.animate();
     },
-    reset: function() {
+    // 🚧 Under construction 🚧
+    /* reset: function() {
         this.bulletCntr = 2;  
         this.score = 0;
         this.gun_Locked = false; 
@@ -129,7 +131,7 @@ Game.prototype = {
         this.gun_Locked = false; 
         this.gameOver = false;
         this.paused = false;
-    },
+    }, */
 
     update: function(time) {
         const bodies = this.bodies;
@@ -206,14 +208,14 @@ Game.prototype = {
 
         this.bodies = this.bodies.filter(notCollidingWithAnything);
 
-        // Are all Invaders are destroyed 
+        // Are all Invaders destroyed 
         const invadersLeftAlive = this.bodies.filter(function(unknownBody) {
             return unknownBody instanceof Invader;
         });
 
         if (invadersLeftAlive.length < 5 && invadersLeftAlive.length >= 3){
             this.invaderFireRate = 0.98;
-            // Radar is on and stays on from here on this level
+            // Radar is on and stays on until all aliens are dead.
             this.radar = true;
         } else  if (invadersLeftAlive.length < 3 && invadersLeftAlive.length >= 2){
             this.invaderFireRate = 0.96;
@@ -446,8 +448,8 @@ Game.prototype = {
         this.screen.textAlign = 'left';
         this.screen.textBaseline = 'top';
     },
-    drawLivesLeftBox: function() {
-        let text = 'Lives: ' + this.playerLivesLeft;
+    drawShipsBox: function() {
+        let text = `Ships: ${this.playerLivesLeft}`;
         this.screen.fillText(text, this.gameSize.x * 0.850, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
         let fontHeight = this.gameSize.y * 0.0375;
