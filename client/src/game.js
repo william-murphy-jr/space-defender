@@ -7,12 +7,13 @@
 
 console.warn("Defender Running ...");
 
-    const Game = function(gameName, canvasId) {
-        const  canvas = document.getElementById(canvasId);
+    class Game {
+    constructor(gameName, canvasId) {
+        const canvas = document.getElementById(canvasId);
         console.log("gameName: ", gameName);
 
-        const  width = $(window).width();
-        const  height = $(window).height();
+        const width = $(window).width();
+        const height = $(window).height();
 
         console.log("width: ", width);
         console.log("height: ", height);
@@ -22,13 +23,13 @@ console.warn("Defender Running ...");
 
         this.screen = canvas.getContext('2d');
         this.gameSize = { x: canvas.width, y: canvas.height };
-        const  self = this;
+        const self = this;
 
-        this. keyListeners = [];
+        this.keyListeners = [];
 
-        this.bulletCntr = 2;  
+        this.bulletCntr = 2;
         this.score = 0;
-        this.gun_Locked = false; 
+        this.gun_Locked = false;
         this.gameOver = false;
         this.paused = false;
         this.PAUSED_TIMEOUT = 100;
@@ -37,11 +38,11 @@ console.warn("Defender Running ...");
         this.invaderFireRate = 0.995;
         this.level = 0;
         this.fleetPatrol_X = 0;
-        this.levelData  = levelData;
+        this.levelData = levelData;
 
         this.player = {};
         this.playerLivesLeft = 3;
-        this.playerStatus = 'ALIVE';  // 'ALIVE' | 'DEAD'
+        this.playerStatus = 'ALIVE'; // 'ALIVE' | 'DEAD'
         this.radar = false;
 
         this.imageLoadingProgressCallback = {};
@@ -50,7 +51,7 @@ console.warn("Defender Running ...");
         this.imagesLoaded = 0;
         this.imagesFailedToLoad = 0;
         this.imagesIndex = 0;
-        
+
         // Image Methods
         this.getImage = getImage;
         this.imageLoadedCallback = imageLoadedCallback;
@@ -67,78 +68,74 @@ console.warn("Defender Running ...");
 
         // Todo --- Put this into an obj to use as sound => url mapping
         // Load our sounds here
-         loadSound("/sounds/rocket-ver-1.wav", function (shootSound) {
-             self.shootSound = shootSound;
-         });
+        loadSound("/sounds/rocket-ver-1.wav", function (shootSound) {
+            self.shootSound = shootSound;
+        });
 
-         loadSound("/sounds/explosion-ver-3.wav", function (explosionSound) {
-             self.explosionSound = explosionSound;
-         });
+        loadSound("/sounds/explosion-ver-3.wav", function (explosionSound) {
+            self.explosionSound = explosionSound;
+        });
 
-         loadSound("/sounds/Alien_Gun-ver-1.wav", function (alienShootSound) {
-             self.alienShootSound = alienShootSound;
+        loadSound("/sounds/Alien_Gun-ver-1.wav", function (alienShootSound) {
+            self.alienShootSound = alienShootSound;
 
-         });
+        });
 
-        self.animate = function(time) {
+        self.animate = function (time) {
 
             // console.log("delta: ", time - self.lastTime);
             self.lastTime = time;
 
-                if (this.gameOver){
-                    // show Game Over Dialog Box Here!!
-                    this.gameOver = false;
-                    game.over();
-                    console.log("***** gameOver: *****");
-                 return;
-                }
+            if (this.gameOver) {
+                // show Game Over Dialog Box Here!!
+                this.gameOver = false;
+                game.over();
+                console.log("***** gameOver: *****");
+                return;
+            }
 
-                if (self.paused){
-                    setTimeout(function() {
-                        requestAnimationFrame(self.animate);
-                    }, this.PAUSED_TIMEOUT);
-                } else { 
-                    self.update(time);
-                    self.draw(self.screen, self.gameSize);
-                    self.drawScoreBox();
-                    self.drawLevelBox();
-                    self.drawShipsBox();
+            if (self.paused) {
+                setTimeout(function () {
                     requestAnimationFrame(self.animate);
-                }
+                }, this.PAUSED_TIMEOUT);
+            } else {
+                self.update(time);
+                self.draw(self.screen, self.gameSize);
+                self.drawScoreBox();
+                self.drawLevelBox();
+                self.drawShipsBox();
+                requestAnimationFrame(self.animate);
+            }
         };
 
         return this;
-}; // end of Game constructor
-
-Game.prototype = {
-
-    start: function() {
-        const  self = this;
+    }
+    start() {
+        const self = this;
         this.loadLevel(this.level);
         this.animate();
-    },
+    }
     // 🚧 Under construction 🚧
     /* reset: function() {
-        this.bulletCntr = 2;  
+        this.bulletCntr = 2;
         this.score = 0;
-        this.gun_Locked = false; 
+        this.gun_Locked = false;
         this.gameOver = false;
         this.paused = false;
         this.invaderFireRate = 0.995;
         this.level = 0;
         this.radar = false;
-        this.bulletCntr = 20;  
-        this.gun_Locked = false; 
+        this.bulletCntr = 20;
+        this.gun_Locked = false;
         this.gameOver = false;
         this.paused = false;
     }, */
-
-    update: function(time) {
+    update(time) {
         const bodies = this.bodies;
         const tempBodies = [...bodies];
 
-       const isCollidingWithSomething = function(b1) {
-            return tempBodies.filter(function(b2) { return colliding(b1, b2); }).length > 0; 
+        const isCollidingWithSomething = function (b1) {
+            return tempBodies.filter(function (b2) { return colliding(b1, b2); }).length > 0;
         };
 
         const filteredBodies = tempBodies.filter(isCollidingWithSomething);
@@ -151,11 +148,11 @@ Game.prototype = {
             const unknownFilteredBody = filteredBodies[i];
 
             if (unknownFilteredBody instanceof Invader) {
-                invaderFilteredBodies.push(unknownFilteredBody)
+                invaderFilteredBodies.push(unknownFilteredBody);
             }
 
             if (unknownFilteredBody instanceof Player) {
-                playerFilteredBodies.push(unknownFilteredBody)
+                playerFilteredBodies.push(unknownFilteredBody);
             }
         }
 
@@ -165,14 +162,14 @@ Game.prototype = {
 
                 invaderFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages, 'Invader');
                 invaderFilteredBodies[i].name = "explosion";
-                
+
                 try {
                     this.explosionSound.load();
                     this.explosionSound.play();
                 } catch (error) {
                     console.error('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
-                
+
                 invaderFilteredBodies[i].size.x = invaderFilteredBodies[i].size.x * 2.5;
                 invaderFilteredBodies[i].size.y = invaderFilteredBodies[i].size.y * 2.5;
             }
@@ -192,7 +189,7 @@ Game.prototype = {
                     this.explosionSound.load();
                     this.explosionSound.play();
                 } catch (error) {
-                    console.error();('Error with loading & playing sound: ', error); // pass exception object to error handler
+                    console.error(); ('Error with loading & playing sound: ', error); // pass exception object to error handler
                 }
 
                 const imagesSizeMultiplier = this.playerLivesLeft ? 2.5 : 6.0;
@@ -202,22 +199,22 @@ Game.prototype = {
             }
         }
 
-        const notCollidingWithAnything = function(b1) {
-            return bodies.filter(function(b2) { return colliding(b1, b2); }).length === 0; 
+        const notCollidingWithAnything = function (b1) {
+            return bodies.filter(function (b2) { return colliding(b1, b2); }).length === 0;
         };
 
         this.bodies = this.bodies.filter(notCollidingWithAnything);
 
         // Are all Invaders destroyed 
-        const invadersLeftAlive = this.bodies.filter(function(unknownBody) {
+        const invadersLeftAlive = this.bodies.filter(function (unknownBody) {
             return unknownBody instanceof Invader;
         });
 
-        if (invadersLeftAlive.length < 5 && invadersLeftAlive.length >= 3){
+        if (invadersLeftAlive.length < 5 && invadersLeftAlive.length >= 3) {
             this.invaderFireRate = 0.98;
             // Radar is on and stays on until all aliens are dead.
             this.radar = true;
-        } else  if (invadersLeftAlive.length < 3 && invadersLeftAlive.length >= 2){
+        } else if (invadersLeftAlive.length < 3 && invadersLeftAlive.length >= 2) {
             this.invaderFireRate = 0.96;
         } else if (invadersLeftAlive.length < 2) {
             this.invaderFireRate = 0.92;
@@ -225,33 +222,33 @@ Game.prototype = {
 
         const allFilteredBodies = [...invaderFilteredBodies, ...playerFilteredBodies];
         // Add bodies back with explosion
-        if (allFilteredBodies.length > 0) {     
+        if (allFilteredBodies.length > 0) {
             for (let j = 0; j < allFilteredBodies.length; j++) {
                 this.bodies.push(allFilteredBodies[j]);
             }
         }
 
         // Remove all bodies that are not visible on the screen 
-        this.bodies = this.bodies.filter(function(theBody) {
+        this.bodies = this.bodies.filter(function (theBody) {
             return theBody.visible;
-        }); 
+        });
 
-        this.bodies = this.bodies.filter(function(theBody) {
-             return theBody.remove === false;
-        }); 
+        this.bodies = this.bodies.filter(function (theBody) {
+            return theBody.remove === false;
+        });
 
         if (this.playerLivesLeft < 1) {
             //delay game over to let animation finish
-            setTimeout(function() {
+            setTimeout(function () {
                 this.gameOver = true;
             }, 750);
         }
 
         if (invadersLeftAlive.length <= 0 && this.playerLivesLeft > 0) {
-            this.paused = true;     
+            this.paused = true;
             this.playerLivesLeft < 8 ? this.playerLivesLeft++ : this.playerLivesLeft;
             this.incrementLevel();
-            setTimeout(function() {
+            setTimeout(function () {
                 this.game.loadLevel();
             }, 1250);
         }
@@ -260,146 +257,129 @@ Game.prototype = {
         for (let idx = 0; idx < this.bodies.length; idx++) {
             this.bodies[idx].update(time);
         }
-    },  // update
-
-    draw: function(screen, gameSize) {
+    }
+    draw(screen, gameSize) {
         screen.clearRect(0, 0, gameSize.x, gameSize.y);
         screen.drawImage(this.backgroundImg, 0, 0, gameSize.x, gameSize.y);
-        
+
         for (let i = 0; i < this.bodies.length; i++) {
             this.bodies[i].draw(this.screen, this.bodies[i]);
         }
-    },
-
-    loadLevel: function() {
+    }
+    loadLevel() {
         console.log(" \n *** Loading level Number " + this.level + " ***");
-        const  level = this.getLevel();
-        const  level_data = this.levelData[level];
-        const  row = level_data.row;
-        const  col = level_data.col;
-        const  behavior = level_data.behavior;
-        const  invaderImage = level_data.invaderImage;
+        const level = this.getLevel();
+        const level_data = this.levelData[level];
+        const row = level_data.row;
+        const col = level_data.col;
+        const behavior = level_data.behavior;
+        const invaderImage = level_data.invaderImage;
 
         this.radar = false;
 
-        this.player  = new Player(this, [ new CycleImages(16, 32) ], 
+        this.player = new Player(this, [new CycleImages(16, 32)],
             new SpritePainter([game.playerImg]), this.gameSize);
 
         this.speedX_Val = level_data.speedX;
         this.invaderFireRate = level_data.invaderFireRate;
         this.backgroundImg = level_data.backgroundImg;
 
-        this.bodies = createInvaders(this, this.gameSize, behavior, invaderImage, 
-        row, col).concat(this.player);
-        
+        this.bodies = createInvaders(this, this.gameSize, behavior, invaderImage,
+            row, col).concat(this.player);
+
         this.paused = false;
-    },
-
-    getLevel: function() {
+    }
+    getLevel() {
         return this.level;
-    },
-
-    incrementLevel: function() {        
+    }
+    incrementLevel() {
         this.level++;
-        if (this.level > this.levelData.length - 1){
+        if (this.level > this.levelData.length - 1) {
             this.level = 0;
         }
         return this.level;
-    },
-
-    addKeyListener: function(keyAndListener) {
+    }
+    addKeyListener(keyAndListener) {
         game.keyListeners.push(keyAndListener);
-    },
-
-    findKeyListener: function(key) {
+    }
+    findKeyListener(key) {
         let listener;
 
-        game.keyListeners.forEach(function(keyAndListener) {
-            const  currentKey = keyAndListener.key;
+        game.keyListeners.forEach(function (keyAndListener) {
+            const currentKey = keyAndListener.key;
             if (currentKey === key) {
                 listener = keyAndListener.listener;
             }
         });
         return listener;
-    },
-
-    keyPressed: function(e) {
+    }
+    keyPressed(e) {
         let listener;
         key = undefined;
 
         switch (e.keyCode) {
-            case 67: key = 'c';         break;
-            case 80: key = 'p';         break;
-            case 83: key = 's';         break;
+            case 67: key = 'c'; break;
+            case 80: key = 'p'; break;
+            case 83: key = 's'; break;
         }
 
         listener = game.findKeyListener(key);
         if (listener) {
             listener();
         }
-    },
-
-    keyUp: function(e) {
+    }
+    keyUp(e) {
         let listener;
         key = undefined;
 
         switch (e.keyCode) {
-            case 32: key = 'spacebar';      break;
-            case 37: key = 'left arrow';    break;
-            case 39: key = 'right arrow';   break;
-            case 38: key = 'up arrow';      break;
-            case 40: key = 'down arrow';    break;
+            case 32: key = 'spacebar'; break;
+            case 37: key = 'left arrow'; break;
+            case 39: key = 'right arrow'; break;
+            case 38: key = 'up arrow'; break;
+            case 40: key = 'down arrow'; break;
         }
 
         listener = game.findKeyListener(key);
         if (listener) {
             listener();
         }
-    },
-
-    addBody: function(body) {
+    }
+    addBody(body) {
         this.bodies.push(body);
-    },
-
-    invadersBelow: function(invader) {
-        return this.bodies.filter(function(b) {
+    }
+    invadersBelow(invader) {
+        return this.bodies.filter(function (b) {
             return b instanceof Invader &&
                 b.center.y > invader.center.y &&
                 b.center.x - invader.center.x < invader.size.x;
         }).length > 0;
-    },
-
-    getHighScores: function() {
-        let key = game.gameName + game.HIGH_SCORES_SUFFIX,
-        highScoresString = localStorage[key];
+    }
+    getHighScores() {
+        let key = game.gameName + game.HIGH_SCORES_SUFFIX, highScoresString = localStorage[key];
         if (highScoresString === undefined) {
             localStorage[key] = JSON.stringify([]);
         }
         return JSON.parse(localStorage[key]);
-    },
-
-    setHighScore: function() {
-        let key = gameName + game.HIGH_SCORES_SUFFIX,
-        highScoresString = localStorage;
+    }
+    setHighScore() {
+        let key = gameName + game.HIGH_SCORES_SUFFIX, highScoresString = localStorage;
 
         highScores.unshift(highScore);
         localStorage[key] = JSON.stringify(highScores);
-    },
-
-    clearHighScores: function() {
+    }
+    clearHighScores() {
         localStorage[game.gameName + this.HIGH_SCORES_SUFFIX] = JSON.stringify([]);
-    },
+    }
+    over() {
+        let highScore = 0, highScores = [{ score: 100 }, { score: 75 }, { score: 50 }];
 
-    over: function() {
-        let highScore = 0,
-        highScores = [{score: 100}, {score: 75} , {score: 50}];
-
-        let lastOnList = $('#highScoreList li').last().text(); 
+        let lastOnList = $('#highScoreList li').last().text();
 
         if (highScores.length === 0 || game.score > highScores[0].score) {
             // this.showHighScores();
             game.highScoreToast.insertAfter('canvas');
-            game.highScoreToast.show(); 
+            game.highScoreToast.show();
             $('#highScoreParagraph').html(game.score);
 
         } else {
@@ -413,23 +393,19 @@ Game.prototype = {
         // this.gameOver = true;
         // this.lastScore = this.score;
         // this.score = 0;
-    },
+    }
     // High Scores ............................................................
-    showHighScores: function() {
+    showHighScores() {
         $("#highScoreParagraph").show();
         $("#highScoreParagraph").text(this.score);
         $("#highScoreToast").text(this.score);
         this.updateHighScoreList();
-    },
-    updateHighScoreList: function() {
-        let el,
-            highScores = game.getHighScores(),
-            length = highScores.length,
-            highScore,
-            listParent = highScoreList.parentNode;  
+    }
+    updateHighScoreList() {
+        let el, highScores = game.getHighScores(), length = highScores.length, highScore, listParent = highScoreList.parentNode;
 
-    },
-    drawScoreBox: function() {
+    }
+    drawScoreBox() {
         let text = 'SCORE: ' + this.score;
         this.screen.fillText(text, this.gameSize.x * 0.075, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
@@ -437,8 +413,8 @@ Game.prototype = {
         this.screen.font = fontHeight + "px Helvetica";
         this.screen.textAlign = 'left';
         this.screen.textBaseline = 'top';
-    },
-    drawLevelBox: function() {
+    }
+    drawLevelBox() {
         const playerLevel = this.level + 1;
         let text = 'Level: ' + playerLevel;
         this.screen.fillText(text, this.gameSize.x * 0.49, this.gameSize.y * 0.050);
@@ -447,8 +423,8 @@ Game.prototype = {
         this.screen.font = fontHeight + "px Helvetica";
         this.screen.textAlign = 'left';
         this.screen.textBaseline = 'top';
-    },
-    drawShipsBox: function() {
+    }
+    drawShipsBox() {
         let text = `Ships: ${this.playerLivesLeft}`;
         this.screen.fillText(text, this.gameSize.x * 0.850, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
@@ -457,8 +433,8 @@ Game.prototype = {
         this.screen.textAlign = 'left';
         this.screen.textBaseline = 'top';
     }
+} // end of Game constructor
 
-}; // end Game.prototype
 
 
 const imageLoadedCallback =  function(e) {
@@ -494,37 +470,36 @@ const loadImages = function() {
 
         return ((this.imagesLoaded + this.imagesFailedToLoad) / 
             this.imageUrls.length) * 100;
-    };
+};
 
     // Call to add image to queue
 const queueImage = function(imageUrl) {
         this.imageUrls.push(imageUrl);
-    };
+};
 
 const getImage = function(imageUrl) {
         return  this.images[imageUrl];
-    };
-    
-const Player = function(game, behavior, painter, gameSize) {
-    this.name = "player";
-    this.gameSize = gameSize;
-    this.behavior = behavior;
-    this.painter = painter;
-    this.game = game;
-    this.step_X = 4;
-    this.step_Y = 4;
-    this.dx = this.dy = 1.015;
-    this.animating = false;
-    this.remove = false; 
-    this.visible = true;
-    this.radar = false;
-    this.size = getSpriteSize('player', this.gameSize);
-    this.center = { x: gameSize.x / 2, y: gameSize.y - 1.0 * this.size.y };
-
 };
+    
+class Player {
+    constructor(game, behavior, painter, gameSize) {
+        this.name = "player";
+        this.gameSize = gameSize;
+        this.behavior = behavior;
+        this.painter = painter;
+        this.game = game;
+        this.step_X = 4;
+        this.step_Y = 4;
+        this.dx = this.dy = 1.015;
+        this.animating = false;
+        this.remove = false;
+        this.visible = true;
+        this.radar = false;
+        this.size = getSpriteSize('player', this.gameSize);
+        this.center = { x: gameSize.x / 2, y: gameSize.y - 1.0 * this.size.y };
 
-Player.prototype = {
-    update: function(time) {
+    }
+    update(time) {
 
         //Loop through all behaviors
         for (let i = 0; i < this.behavior.length; i++) {
@@ -550,18 +525,20 @@ Player.prototype = {
             this.center.y += this.step_Y;
         }
         if (this.game.keyboarder.isDown(this.game.keyboarder.KEYS.DOWN)) {
-            this.step_Y *= this.dy; 
+            this.step_Y *= this.dy;
             this.step_Y = this.step_Y > 8 ? 8 : this.step_Y;
             this.center.y = this.center.y < (0 - this.size.y / 2) ? this.game.gameSize.y : this.center.y;
             this.center.y -= this.step_Y;
-        } 
-        if (this.game.keyboarder.isDown(this.game.keyboarder.KEYS.SPACE) && 
+        }
+        if (this.game.keyboarder.isDown(this.game.keyboarder.KEYS.SPACE) &&
             !this.game.gun_Locked) {
             this.game.bulletCntr--;
             this.game.gun_Locked = this.game.bulletCntr <= 0 ? true : false;
 
-            let missle = new Missle({ x: this.center.x, y: this.center.y - 
-                this.size.y / 2}, { x: 0, y: -this.gameSize.y * 0.0150 }, 
+            let missle = new Missle({
+                x: this.center.x, y: this.center.y -
+                    this.size.y / 2
+            }, { x: 0, y: -this.gameSize.y * 0.0150 },
                 this.gameSize);
             this.game.score -= 5;
             this.game.addBody(missle);
@@ -570,42 +547,41 @@ Player.prototype = {
             try {
                 this.game.shootSound.load();
                 this.game.shootSound.play();
-            } 
-            catch(error) {
+            }
+            catch (error) {
                 console.error('Error loading sound: ', error);
             }
         }
-    },
-    draw: function(screen, body) {
+    }
+    draw(screen, body) {
         this.painter.draw(screen, body);
-        }   
-};
+    }
+}
 
-const Invader = function(game, center, behavior, painter, gameSize) {
-    this.name = "invader";
-    this.game = game;
-    this.gameSize = gameSize;
-    this.behavior = behavior;
-    this.painter = painter;
 
-    this.visible = true;
-    this.animating = false;
-    this.remove = false;
-    // this.game.radar = false;
-    
-    this.size = getSpriteSize('invader', this.gameSize);
+class Invader {
+    constructor(game, center, behavior, painter, gameSize) {
+        this.name = "invader";
+        this.game = game;
+        this.gameSize = gameSize;
+        this.behavior = behavior;
+        this.painter = painter;
 
-    this.center = center;
-    this.radians = 0.025;
-    this.totalRadians = 0;
-    this.scaleHeight = 1.5;
-    this.patrolX = 0;
+        this.visible = true;
+        this.animating = false;
+        this.remove = false;
+        // this.game.radar = false;
+        this.size = getSpriteSize('invader', this.gameSize);
 
-    this.speedX = gameSize.x * this.game.speedX_Val; 
-};
+        this.center = center;
+        this.radians = 0.025;
+        this.totalRadians = 0;
+        this.scaleHeight = 1.5;
+        this.patrolX = 0;
 
-Invader.prototype = {
-    update: function(time) {
+        this.speedX = gameSize.x * this.game.speedX_Val;
+    }
+    update(time) {
 
         let targetLocation = {};
 
@@ -615,19 +591,21 @@ Invader.prototype = {
 
         this.visible = this.center.y > this.gameSize.y * 1.10 ? false : true;
 
-        if (Math.random() > this.game.invaderFireRate && 
+        if (Math.random() > this.game.invaderFireRate &&
             !this.game.invadersBelow(this)) {
 
 
             if (this.game.radar === true) {
-                targetLocation = radarGuidance(this.game.player, 
+                targetLocation = radarGuidance(this.game.player,
                     this, this.gameSize.y * 0.0075);
             } else {
                 targetLocation = { x: 0, y: this.gameSize.y * 0.0075 };
             }
 
-            let bullet = new Bullet({ x: this.center.x, y: this.center.y + 
-                this.size.x / 2}, targetLocation, 
+            let bullet = new Bullet({
+                x: this.center.x, y: this.center.y +
+                    this.size.x / 2
+            }, targetLocation,
                 this.gameSize);
             this.game.addBody(bullet);
 
@@ -638,11 +616,12 @@ Invader.prototype = {
                 console.error('Error adding alienShootSound: ', error);
             }
         }
-    },
-    draw: function(screen, body) {
+    }
+    draw(screen, body) {
         this.painter.draw(screen, body);
-    }   
-};
+    }
+}
+
 
 const createInvaders = function(game, gameSize, behavior, invaderImage, row, col) {
     this.game = game;
@@ -807,66 +786,65 @@ const dropDiagonal = {
     }
 };
 
-const Bullet = function(center, velocity, gameSize) {
-    this.gameSize = gameSize;
-    this.center = center;
-    this.velocity = velocity;
-    this.visible = true;
-    this.remove = false;
-    this.size = getSpriteSize('bullet', gameSize);
-};
-
-Bullet.prototype = {
-    update: function() {
+class Bullet {
+    constructor(center, velocity, gameSize) {
+        this.gameSize = gameSize;
+        this.center = center;
+        this.velocity = velocity;
+        this.visible = true;
+        this.remove = false;
+        this.size = getSpriteSize('bullet', gameSize);
+    }
+    update() {
         this.center.x += this.velocity.x;
-        this.center.y += this.velocity.y; 
+        this.center.y += this.velocity.y;
 
         // If the bullet moves off the board
         // set to visible = false
-        if (this.center.y <  0 - (this.gameSize.y * 0.10)   || 
-            this.center.y > this.gameSize.y * 1.10          ||
-            this.center.x < 0 - (this.gameSize.x * 0.10)    ||
+        if (this.center.y < 0 - (this.gameSize.y * 0.10) ||
+            this.center.y > this.gameSize.y * 1.10 ||
+            this.center.x < 0 - (this.gameSize.x * 0.10) ||
             this.center.x > this.gameSize.x * 1.10) {
 
             this.visible = false;
         }
-    }, 
-    draw: function(screen, body) {
-        screen.drawImage(game.enemy_bulletImg, body.center.x - body.size.x / 2, 
-            body.center.y - body.size.y / 2 , body.size.x, body.size.y);
     }
-};
+    draw(screen, body) {
+        screen.drawImage(game.enemy_bulletImg, body.center.x - body.size.x / 2,
+            body.center.y - body.size.y / 2, body.size.x, body.size.y);
+    }
+}
 
-const Missle = function(center, velocity, gameSize) {
-    this.gameSize = gameSize;
-    // this.size = { x: 15, y: 25 };
-    this.size = getSpriteSize('missle', gameSize);
-    this.center = center;
-    this.velocity = velocity;
-    this.visible = true;
-    this.remove = false;
-};
 
-Missle.prototype = {
-    update: function() {
+class Missle {
+    constructor(center, velocity, gameSize) {
+        this.gameSize = gameSize;
+        // this.size = { x: 15, y: 25 };
+        this.size = getSpriteSize('missle', gameSize);
+        this.center = center;
+        this.velocity = velocity;
+        this.visible = true;
+        this.remove = false;
+    }
+    update() {
         this.center.x += this.velocity.x;
-        this.center.y += this.velocity.y; 
+        this.center.y += this.velocity.y;
 
         // If the Missle moves off the board
         // set visible to fasle
-        if (this.center.y <  0 - (this.gameSize.y * 0.10)   || 
-            this.center.y > this.gameSize.y * 1.10          ||
-            this.center.x < 0 - (this.gameSize.x * 0.10)    ||
+        if (this.center.y < 0 - (this.gameSize.y * 0.10) ||
+            this.center.y > this.gameSize.y * 1.10 ||
+            this.center.x < 0 - (this.gameSize.x * 0.10) ||
             this.center.x > this.gameSize.x * 1.10) {
 
             this.visible = false;
         }
-    }, 
-    draw: function(screen, body) {
-        screen.drawImage(game.missleImg, body.center.x - body.size.x / 2, 
-            body.center.y - body.size.y / 2 , body.size.x, body.size.y);
     }
-};
+    draw(screen, body) {
+        screen.drawImage(game.missleImg, body.center.x - body.size.x / 2,
+            body.center.y - body.size.y / 2, body.size.x, body.size.y);
+    }
+}
 
 const Keyboarder = function(game) {
         let keyState = {}; // not const
@@ -929,11 +907,6 @@ const sound = new Audio(url);
     sound.load();
 };
 
-const SpritePainter = function(images) {
-    this.images = images;
-    this.imagesIndex = 0;
-};
-
 const radarGuidance = function(shooter, target, velocity) {
     let rev = -1,
         dx = shooter.center.x - target.center.x,
@@ -950,34 +923,37 @@ const radarGuidance = function(shooter, target, velocity) {
 
     return {x: velocity_Dx, y: velocity_Dy};
 };
-
-SpritePainter.prototype = {
-    advance: function(body) {
+class SpritePainter {
+    constructor(images) {
+        this.images = images;
+        this.imagesIndex = 0;
+    }
+    advance(body) {
         if (this.imagesIndex === this.images.length - 1) {
             this.imagesIndex = 0;
         } else {
             this.imagesIndex++;
         }
-    },
-    draw: function(screen, body) {
+    }
+    draw(screen, body) {
         let spriteImage = this.images[this.imagesIndex];
 
         screen.drawImage(spriteImage, body.center.x - body.size.x / 2,
-        body.center.y - body.size.y / 2, body.size.x, body.size.y);
+            body.center.y - body.size.y / 2, body.size.x, body.size.y);
     }
-};
+}
 
-const ExplosionSpritePainter = function(images, kindOfBody) {
-    this.images = images;
-    this.imagesIndex = 0;
-    this.kindOfBody = kindOfBody ? kindOfBody : null;
-};
 
-ExplosionSpritePainter.prototype = {
-    advance: function(body) {
+class ExplosionSpritePainter {
+    constructor(images, kindOfBody) {
+        this.images = images;
+        this.imagesIndex = 0;
+        this.kindOfBody = kindOfBody ? kindOfBody : null;
+    }
+    advance(body) {
         // Last image so reset everything here
         if (this.imagesIndex === this.images.length - 1) {
-            if  (this.kindOfBody === 'Invader') {
+            if (this.kindOfBody === 'Invader') {
                 body.remove = true;
                 body.visible = false;
                 body.animating = false;
@@ -1003,40 +979,37 @@ ExplosionSpritePainter.prototype = {
         } else {
             this.imagesIndex++;
         }
-    },
-    draw: function(screen, body) {
-       let spriteImage = this.images[this.imagesIndex];
+    }
+    draw(screen, body) {
+        let spriteImage = this.images[this.imagesIndex];
         body.animating = true;
 
         try {
             screen.drawImage(spriteImage, body.center.x - body.size.x / 2,
-            body.center.y - body.size.y / 2, body.size.x, body.size.y);
+                body.center.y - body.size.y / 2, body.size.x, body.size.y);
         }
         catch (error) {
-           // statements to handle any exceptions
-           console.warn('Error writing spite to screen ', error); // pass exception object to error handler
+            // statements to handle any exceptions
+            console.warn('Error writing spite to screen ', error); // pass exception object to error handler
         }
 
     }
-};
+}
 
-const CycleImages = function(frameCnt, PAGE_FLIP_INTERVAL) {
-    this.frameCounter = 0;
-    this.frameCnt = frameCnt;
-    this.lastAdvance = 0;
-    this.PAGE_FLIP_INTERVAL = PAGE_FLIP_INTERVAL;
-};
-
-CycleImages.prototype = {
-
-    execute: function(body, gameSize, time) {
+class CycleImages {
+    constructor(frameCnt, PAGE_FLIP_INTERVAL) {
+        this.frameCounter = 0;
+        this.frameCnt = frameCnt;
+        this.lastAdvance = 0;
+        this.PAGE_FLIP_INTERVAL = PAGE_FLIP_INTERVAL;
+    }
+    execute(body, gameSize, time) {
         if (time - this.lastAdvance > this.PAGE_FLIP_INTERVAL) {
             body.painter.advance(body);
             this.lastAdvance = time;
         }
     }
-};
-
+}
 
 /* We store level data here in an array of  objects
  * @speedX - speed of Invaders
@@ -1145,6 +1118,7 @@ $('#pausedToast').on('click', function(e){
 });
 
 $('.newGameButton, .closeHighScoreToast').on('click', function (e) {
+    // 🚧 Under construction 🚧
     // console.log('game.start();');
     // Get the reset() working later
     // game.reset();
@@ -1286,7 +1260,6 @@ $('#screen').show();
 // $('loadToastTitle').hide()
 
     // $('#loadToastTitle').css("display", "none");
-
 
     game.explosionImages.push( game.tmp1, game.tmp2, game.tmp3, game.tmp4,
         game.tmp5, game.tmp6, game.tmp7, game.tmp8, game.tmp9, game.tmp10,
