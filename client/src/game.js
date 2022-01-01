@@ -14,6 +14,14 @@ console.warn("Defender Running ...");
 
         const width = $(window).width();
         const height = $(window).height();
+        const self = this;
+
+        // Keep score private as much as you can with JavaScript
+        let _score = 0
+        this.incrScore = () => (_score += (100 * (this.level + 1)));
+        this.decrScore = () => (_score -= 5);
+        this.getScore = () => _score;
+        this.resetScore= () => { _score = 0 };
 
         console.log("width: ", width);
         console.log("height: ", height);
@@ -23,12 +31,11 @@ console.warn("Defender Running ...");
 
         this.screen = canvas.getContext('2d');
         this.gameSize = { x: canvas.width, y: canvas.height };
-        const self = this;
 
         this.keyListeners = [];
 
         this.bulletCntr = 2;
-        this.score = 0;
+        // this.score = 0;
         this.gun_Locked = false;
         this.gameOver = false;
         this.paused = false;
@@ -158,7 +165,8 @@ console.warn("Defender Running ...");
 
         for (let i = 0; i < invaderFilteredBodies.length; i++) {
             if (invaderFilteredBodies[i].name === "invader") {
-                this.score += 100 * (this.getLevel() + 1);
+                // this.score += 100 * (this.getLevel() + 1);
+                this.incrScore();
 
                 invaderFilteredBodies[i].painter = new ExplosionSpritePainter(game.explosionImages, 'Invader');
                 invaderFilteredBodies[i].name = "explosion";
@@ -376,19 +384,19 @@ console.warn("Defender Running ...");
 
         let lastOnList = $('#highScoreList li').last().text();
 
-        if (highScores.length === 0 || game.score > highScores[0].score) {
+        if (highScores.length === 0 || game.getScore() > highScores[0].score) {
             // this.showHighScores();
             game.highScoreToast.insertAfter('canvas');
             game.highScoreToast.show();
-            $('#highScoreParagraph').html(game.score);
+            $('#highScoreParagraph').html(game.getScore());
 
         } else {
             game.gameOverToast.insertAfter('canvas');
             game.gameOverToast.show();
-            $('#highScoreParagraph').html(game.score);
+            $('#highScoreParagraph').html(game.getScore());
         }
 
-        $('#inputScore').val(game.score);
+        $('#inputScore').val(game.getScore());
 
         // this.gameOver = true;
         // this.lastScore = this.score;
@@ -397,8 +405,8 @@ console.warn("Defender Running ...");
     // High Scores ............................................................
     showHighScores() {
         $("#highScoreParagraph").show();
-        $("#highScoreParagraph").text(this.score);
-        $("#highScoreToast").text(this.score);
+        $("#highScoreParagraph").text(this.getScore());
+        $("#highScoreToast").text(this.getScore());
         this.updateHighScoreList();
     }
     updateHighScoreList() {
@@ -406,7 +414,7 @@ console.warn("Defender Running ...");
 
     }
     drawScoreBox() {
-        let text = 'SCORE: ' + this.score;
+        let text = 'SCORE: ' + this.getScore();
         this.screen.fillText(text, this.gameSize.x * 0.075, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
         let fontHeight = this.gameSize.y * 0.0375;
@@ -540,7 +548,7 @@ class Player {
                     this.size.y / 2
             }, { x: 0, y: -this.gameSize.y * 0.0150 },
                 this.gameSize);
-            this.game.score -= 5;
+            this.game.decrScore();
             this.game.addBody(missle);
 
 
@@ -1273,5 +1281,3 @@ $('#screen').show();
         game.start();
     }, 250)
 });
-
-const gScore = game.score;
