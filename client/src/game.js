@@ -10,21 +10,45 @@ console.warn("Defender Running ...");
     class Game {
     constructor(gameName, canvasId) {
         const canvas = document.getElementById(canvasId);
-        console.log("gameName: ", gameName);
-
         const width = $(window).width();
         const height = $(window).height();
         const self = this;
 
+        this._DEBUG = false;  // Use turn on/off console.log's
+        this._DEBUG && console.log("gameName: ", gameName);
+
+        this._DEBUG && console.log("width: ", width);
+        this._DEBUG && console.log("height: ", height);
+
         // Keep score private as much as you can with JavaScript
         let _score = 0
-        this.incrScore = () => (_score += (100 * (this.level + 1)));
-        this.decrScore = () => (_score -= 5);
+        this.incrScore = () => { _score += (100 * (this.getLevel() + 1)) };
+        this.decrScore = () => { _score -= 5 };
         this.getScore = () => _score;
         this.resetScore= () => { _score = 0 };
 
-        console.log("width: ", width);
-        console.log("height: ", height);
+        // Keep level private as much as you can with JavaScript
+        let _level = 0;
+
+        this.incrementLevel = () => {
+            _level++;
+            if (_level > this.levelData.length - 1) {
+                _level = 0;
+            }
+            return _level;
+        };
+        this.decrLevel = () => {
+            _level--;
+            if (_level < 0) {
+                _level = 0;
+            }
+         }
+        this.resetLevel = (val) => {
+            val = val ? val : 0;
+             _level = val;
+             return _level;
+        };
+        this.getLevel = () => _level;
 
         canvas.width = width;
         canvas.height = height;
@@ -43,7 +67,7 @@ console.warn("Defender Running ...");
         this.HIGH_SCORES_SUFFIX = '_highScores';
 
         this.invaderFireRate = 0.995;
-        this.level = 0;
+        // this.level = 0;
         this.fleetPatrol_X = 0;
         this.levelData = levelData;
 
@@ -97,7 +121,7 @@ console.warn("Defender Running ...");
                 // show Game Over Dialog Box Here!!
                 this.gameOver = false;
                 game.over();
-                console.log("***** gameOver: *****");
+                this._DEBUG && console.log("***** gameOver: *****");
                 return;
             }
 
@@ -118,8 +142,8 @@ console.warn("Defender Running ...");
         return this;
     }
     start() {
-        const self = this;
-        this.loadLevel(this.level);
+        // We start at level 0 of course
+        this.loadLevel();
         this.animate();
     }
     // 🚧 Under construction 🚧
@@ -130,7 +154,7 @@ console.warn("Defender Running ...");
         this.gameOver = false;
         this.paused = false;
         this.invaderFireRate = 0.995;
-        this.level = 0;
+        this.resetLevel(0);
         this.radar = false;
         this.bulletCntr = 20;
         this.gun_Locked = false;
@@ -258,7 +282,7 @@ console.warn("Defender Running ...");
             this.incrementLevel();
             setTimeout(function () {
                 this.game.loadLevel();
-            }, 1250);
+            }, 1500);
         }
 
         // Update Position
@@ -275,38 +299,31 @@ console.warn("Defender Running ...");
         }
     }
     loadLevel() {
-        console.log(" \n *** Loading level Number " + this.level + " ***");
         const level = this.getLevel();
-        const level_data = this.levelData[level];
-        const row = level_data.row;
-        const col = level_data.col;
-        const behavior = level_data.behavior;
-        const invaderImage = level_data.invaderImage;
+        this._DEBUG && console.log(` \n *** Loading level Number ${level} ***`);
+        const { row, col, behavior, invaderImage,
+            speedX, invaderFireRate, backgroundImg
+        } =  this.levelData[level];
 
         this.radar = false;
+        this.speedX_Val = speedX;
+        this.invaderFireRate = invaderFireRate;
+        this.backgroundImg = backgroundImg;
 
         this.player = new Player(this, [new CycleImages(16, 32)],
-            new SpritePainter([game.playerImg]), this.gameSize);
-
-        this.speedX_Val = level_data.speedX;
-        this.invaderFireRate = level_data.invaderFireRate;
-        this.backgroundImg = level_data.backgroundImg;
+        new SpritePainter([game.playerImg]), this.gameSize);
 
         this.bodies = createInvaders(this, this.gameSize, behavior, invaderImage,
             row, col).concat(this.player);
 
-        this.paused = false;
+        // Add a half second-delay to slow
+        // the pace of the game on a level change.
+        setTimeout(() => {
+            this.paused = false;
+        }, 500);
+
     }
-    getLevel() {
-        return this.level;
-    }
-    incrementLevel() {
-        this.level++;
-        if (this.level > this.levelData.length - 1) {
-            this.level = 0;
-        }
-        return this.level;
-    }
+
     addKeyListener(keyAndListener) {
         game.keyListeners.push(keyAndListener);
     }
@@ -423,7 +440,7 @@ console.warn("Defender Running ...");
         this.screen.textBaseline = 'top';
     }
     drawLevelBox() {
-        const playerLevel = this.level + 1;
+        const playerLevel = this.getLevel() + 1;
         let text = 'Level: ' + playerLevel;
         this.screen.fillText(text, this.gameSize.x * 0.49, this.gameSize.y * 0.050);
         this.screen.fillStyle = 'white';
@@ -442,8 +459,6 @@ console.warn("Defender Running ...");
         this.screen.textBaseline = 'top';
     }
 } // end of Game constructor
-
-
 
 const imageLoadedCallback =  function(e) {
         this.imagesLoaded++;
@@ -1193,7 +1208,7 @@ $(window).on('focus', function() {
         // console.log('loading Percentage Completed: ', loadingPercentComplete);
 
         if (loadingPercentComplete === 100) {
-            console.log("loading ... 100% Complete: OK!!!");
+            game._DEBUG && console.log("loading ... 100% Complete: OK!!!");
             clearInterval(interval);
         }
 
