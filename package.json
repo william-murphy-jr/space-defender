@@ -8,7 +8,7 @@
     "start": "node space_defender.js"
   },
   "dependencies": {
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.20.1",
     "dotenv": "^6.2.0",
     "express": "latest",
     "express3-handlebars": "^0.5.2",
